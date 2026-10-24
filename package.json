@@ -1,16 +1,19 @@
 {
   "name": "birl-arcade",
-  "version": "0.1.0",
-  "description": "Fliperama de jogos de terminal escrito em BIRL, com tema de academia",
+  "version": "0.2.0",
+  "description": "Fliperama BIRL com interface GTK4 e modo terminal",
   "main": "main.birl",
   "scripts": {
-    "start": "birl main.birl",
-    "ver-js": "birl -j main.birl"
+    "build": "./build",
+    "start": "./build && birl main.birl",
+    "gui": "./build && python3 gui/app.py",
+    "ver-js": "./build && birl -j main.birl"
   },
   "keywords": [
     "birl",
     "arcade",
     "terminal",
+    "gtk4",
     "maromba"
   ],
   "author": "",

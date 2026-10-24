@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")"
+
+OUT="main.birl"
+{
+  echo "HORA DO SHOW"
+  echo
+  for f in birl/[0-9]*.birl; do
+    cat "$f"
+    echo
+  done
+  echo "AJUDA O MALUCO TA DOENTE RODA(0)"
+  echo
+  echo "BIRL"
+} > "$OUT"
+
+echo "main.birl gerado com $(wc -l < "$OUT") linhas."
