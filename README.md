@@ -17,7 +17,7 @@ Sem servidor web, sem interface gráfica, sem água com músculo: tudo roda no t
 | # | Jogo | Status |
 |---|------|--------|
 | 1 | Jogo da Velha vs Bambam | pronto |
-| 2 | Simulador de Academia (RPG de texto) | em breve |
+| 2 | Simulador de Academia (RPG de texto) | pronto |
 | 3 | Tamagotchi do Monstro | em breve |
 | 4 | Dungeon da Academia (roguelike ASCII) | em breve |
 
