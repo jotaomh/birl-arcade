@@ -1,1 +1,4 @@
-node_modules/\n.npm/\n*.log\n.DS_Store\n
+node_modules/
+.npm/
+*.log
+.DS_Store
