@@ -1,23 +1,20 @@
 {
   "name": "birl-arcade",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "Fliperama de jogos de terminal escrito em BIRL, com tema de academia",
+  "main": "main.birl",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "birl main.birl",
+    "ver-js": "birl -j main.birl"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jotaomh/birl-arcade.git"
-  },
-  "keywords": [],
+  "keywords": [
+    "birl",
+    "arcade",
+    "terminal",
+    "maromba"
+  ],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/jotaomh/birl-arcade/issues"
-  },
-  "homepage": "https://github.com/jotaomh/birl-arcade#readme",
   "dependencies": {
     "birl-js": "^1.0.3"
   }
