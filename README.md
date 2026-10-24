@@ -19,7 +19,7 @@ Sem servidor web, sem interface gráfica, sem água com músculo: tudo roda no t
 | 1 | Jogo da Velha vs Bambam | pronto |
 | 2 | Simulador de Academia (RPG de texto) | pronto |
 | 3 | Tamagotchi do Monstro | pronto |
-| 4 | Dungeon da Academia (roguelike ASCII) | em breve |
+| 4 | Dungeon da Academia (roguelike ASCII) | pronto |
 
 Ao terminar qualquer jogo, o jogo volta para o menu principal.
 
@@ -71,7 +71,10 @@ npx birl -j main.birl
 ## Controles
 
 - Digite o número da opção e aperte **Enter**.
-- No jogo da velha, escolha uma casa de `0` a `8` (a posição aparece no tabuleiro).
+- Jogo da velha: escolha uma casa de `0` a `8` (a posição aparece no tabuleiro).
+- Simulador de Academia: `1` treinar, `2` comer frango, `3` whey, `4` descansar, `0` sair.
+- Tamagotchi: `1` treinar, `2` alimentar, `3` whey/vapo, `4` ignorar (murcha mais rápido), `0` sair.
+- Dungeon: `W` cima, `A` esquerda, `S` baixo, `D` direita, `Q` sair. Aperte **Enter** para atacar nas batalhas.
 - `Ctrl+D` (fim da entrada) encerra o fliperama.
 
 ## Estrutura
@@ -102,5 +105,10 @@ os blocos já estão separados por funções e podem ser movidos para arquivos p
 - Números aleatórios: `Math.random()` / `Math.floor(...)` (via JS), com auxílio de `|| 0`.
 - Leitura de teclado: `fs.readSync(0, ...)` byte a byte (a linguagem não tem `input()`).
 - Sem comentários (`//` quebra o parser) e `>=` / `<=` têm bug na gramática: use `>` / `<`.
+- **Não existe precedência de operadores**: tudo é avaliado da esquerda para a direita.
+  Por isso cálculos mistos usam variáveis temporárias.
+- Atribuir uma variável a outra exige uma operação: `B = A + 0` (não existe `B = A`).
+- Arrays não aceitam leitura por índice (`A[1]`); use `.charAt()` em strings ou `.splice()`/`.join()`.
+- Chamada de função dentro de `BORA CUMPADI` diretamente não funciona: atribua a uma variável antes.
 
 Sai de casa codei pra caralho!™
