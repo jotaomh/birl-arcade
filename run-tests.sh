@@ -52,6 +52,9 @@ verificar_saida "tamagotchi" $'4\n0' "TAMAGOTCHI DO MONSTRO"
 echo "==> Teste: Dungeon RPG..."
 verificar_saida "dungeon" $'5\n1' "DUNGEON DA ACADEMIA RPG"
 
+echo "==> Teste: LE_LINHA com acentos..."
+verificar_saida "le_linha" $'2\nCAFÉ\n\n\n\n0\n' "____"
+
 echo ""
 if [ "$ERROS" -eq 0 ]; then
   echo "Todos os testes de regressão passaram."
