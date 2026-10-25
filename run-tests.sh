@@ -19,13 +19,13 @@ else
 fi
 
 # Função auxiliar: roda o BIRL com entradas e verifica se contém uma string.
-# $entradas deve ser uma string com cada entrada em uma linha separada por \n.
+# $entradas deve ser uma string com cada entrada em uma linha separada por nova linha.
 verificar_saida() {
   local jogo="$1"
   local entradas="$2"
   local esperado="$3"
   local saida
-  saida=$(printf '%b\n' "$entradas" | timeout 20 node node_modules/birl-js/index.js main.birl 2>&1 || true)
+  saida=$(printf '%s\n' "$entradas" | timeout 20 node node_modules/birl-js/index.js main.birl 2>&1 || true)
   if echo "$saida" | grep -qF "$esperado"; then
     echo "OK: $jogo -> contém '$esperado'"
   else
@@ -37,29 +37,39 @@ verificar_saida() {
   fi
 }
 
+# Definir entradas como variáveis para evitar problemas com $'...' e aspas
+entradas_velha=$'1\n4\n0'
+entradas_forca=$'2\nSUPINO\n\n'
+entradas_academia=$'3\n1\n5\n0'
+entradas_tamagotchi=$'4\n0'
+entradas_dungeon=$'5\n1'
+entradas_le_linha=$'2\nABACATE\n\n\n\n0\n'
+entradas_forca_freq=$'2\nSUPINO\n\n\n\n\n\n0\n'
+entradas_forca_errada=$'2\nSUPINO\nA\n\n\n\n0\n'
+
 echo "==> Teste: Jogo da Velha..."
-verificar_saida "velha" $'1\n4\n0' "JOGO DA VELHA"
+verificar_saida "velha" "$entradas_velha" "JOGO DA VELHA"
 
 echo "==> Teste: Forca..."
-verificar_saida "forca" $'2\nSUPINO' "FORCA"
+verificar_saida "forca" "$entradas_forca" "FORCA"
 
 echo "==> Teste: Academia..."
-verificar_saida "academia" $'3\n1\n5\n0' "SIMULADOR DE ACADEMIA"
+verificar_saida "academia" "$entradas_academia" "SIMULADOR DE ACADEMIA"
 
 echo "==> Teste: Tamagotchi..."
-verificar_saida "tamagotchi" $'4\n0' "TAMAGOTCHI DO MONSTRO"
+verificar_saida "tamagotchi" "$entradas_tamagotchi" "TAMAGOTCHI DO MONSTRO"
 
 echo "==> Teste: Dungeon RPG..."
-verificar_saida "dungeon" $'5\n1' "DUNGEON DA ACADEMIA RPG"
+verificar_saida "dungeon" "$entradas_dungeon" "DUNGEON DA ACADEMIA RPG"
 
 echo "==> Teste: LE_LINHA com acentos..."
-verificar_saida "le_linha" $'2\nCAFÉ\n\n\n\n0\n' "____"
+verificar_saida "le_linha" "$entradas_le_linha" "_______"
 
 echo "==> Teste: Forca chuta por frequencia (não ordem alfabética)..."
-verificar_saida "forca_freq" $'2\nSUPINO\n\n\n\n\n\n0\n' "CHUTA O"
+verificar_saida "forca_freq" "$entradas_forca_freq" "CHUTA O"
 
 echo "==> Teste: Forca elimina palavras com letra errada..."
-verificar_saida "forca_errada" $'2\nSUPINO\nA\n\n\n\n0\n' "CHUTA O"
+verificar_saida "forca_errada" "$entradas_forca_errada" "CHUTA O"
 
 echo ""
 if [ "$ERROS" -eq 0 ]; then
