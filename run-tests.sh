@@ -58,6 +58,9 @@ verificar_saida "le_linha" $'2\nCAFÉ\n\n\n\n0\n' "____"
 echo "==> Teste: Forca chuta por frequencia (não ordem alfabética)..."
 verificar_saida "forca_freq" $'2\nSUPINO\n\n\n\n\n\n0\n' "CHUTA O"
 
+echo "==> Teste: Forca elimina palavras com letra errada..."
+verificar_saida "forca_errada" $'2\nSUPINO\nA\n\n\n\n0\n' "CHUTA O"
+
 echo ""
 if [ "$ERROS" -eq 0 ]; then
   echo "Todos os testes de regressão passaram."
