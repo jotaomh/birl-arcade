@@ -1,5 +1,7 @@
 # BIRL Arcade
 
+![CI](https://github.com/jotaomh/birl-arcade/actions/workflows/ci.yml/badge.svg)
+
 Fliperama de jogos com tema de academia/maromba. O **cérebro é 100% BIRL**
 (`birl-js` 1.0.3): estado, regras e IA. A interface gráfica é uma casca fina em
 **Python 3 + GTK4** que conversa com o BIRL por stdin/stdout. O modo terminal
@@ -191,3 +193,19 @@ Os valores são fáceis de ajustar para balanceamento posterior.
 - Nenhuma arte ou áudio de terceiros (anime, jogos, pessoas reais) é usada ou baixada pelo projeto.
 
 Sai de casa codei pra caralho!™
+
+## Contribuição
+
+Veja [CONTRIBUTING.md](CONTRIBUTING.md) para o fluxo de branches, mensagens de
+commit (Conventional Commits) e como testar localmente.
+
+A configuração de GitHub (templates de PR/Issue, labels, CI, Dependabot, CODEOWNERS)
+fica em [`.github/`](.github/). Abra PRs para a branch `main`; o merge só acontece
+após aprovação do mantenedor.
+
+## Proporção de BIRL
+
+O BIRL detém aproximadamente **71,7%** das linhas de código do projeto
+(1.826 de 2.545 linhas de código, excluindo `main.birl` gerado e docs). A interface
+GTK4/Python responde por ~26,5% e o shell por ~1,7%. O objetivo é manter o BIRL
+como protagonista (cérebro), com a GUI como casca fina.

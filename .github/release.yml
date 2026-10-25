@@ -1,0 +1,26 @@
+# .github/release.yml
+# Usado pelo GitHub Actions (ou manualmente com `gh release create --generate-notes`).
+# Agrupa as notas de release por label.
+
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+  categories:
+    - title: "Funcionalidades"
+      labels:
+        - type:feat
+        - enhancement
+    - title: "Correções"
+      labels:
+        - type:fix
+        - type:hotfix
+        - bug
+    - title: "Alterações técnicas"
+      labels:
+        - type:chore
+        - type:audit
+        - refactor
+    - title: "Outras Mudanças"
+      labels:
+        - "*"

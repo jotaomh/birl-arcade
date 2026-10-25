@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: Releases e Versões
+    url: https://github.com/jotaomh/birl-arcade/releases
+    about: Consulte as versões e tags do projeto para se conectar com os estados da codebase.
+  - name: Discussão Geral
+    url: https://github.com/jotaomh/birl-arcade/discussions
+    about: Tire dúvidas, sugira ideias e converse com a comunidade.

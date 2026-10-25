@@ -1,0 +1,95 @@
+# Labels do BIRL Arcade
+# Criar com: gh label create --repo jutaomh/birl-arcade --file .github/labels.yml
+# ou usar actions/labeler para rotulagem automática.
+
+- name: "type:feat"
+  description: Nova funcionalidade
+  color: "0e8a16"
+
+- name: "type:fix"
+  description: Correção de bug
+  color: "d73a4a"
+
+- name: "type:hotfix"
+  description: Correção urgente
+  color: "b60205"
+
+- name: "type:audit"
+  description: Auditoria ou revisão de integridade
+  color: "5319e7"
+
+- name: "type:release"
+  description: Corte de release / tag
+  color: "1d76db"
+
+- name: "type:chore"
+  description: Manutenção, build, CI, docs
+  color: "9e9e9e"
+
+- name: "jogo:velha"
+  description: Jogo da Velha vs Bambam
+  color: "fbca04"
+
+- name: "jogo:forca"
+  description: Forca do Bambam
+  color: "f9d71c"
+
+- name: "jogo:academia"
+  description: Simulador de Academia
+  color: "c5e002"
+
+- name: "jogo:tamagotchi"
+  description: Tamagotchi do Monstro
+  color: "ff9999"
+
+- name: "jogo:dungeon"
+  description: Dungeon da Academia
+  color: "8b5cf6"
+
+- name: "jogo:novo"
+  description: Proposta de novo jogo
+  color: "d4c5f9"
+
+- name: "area:birl"
+  description: Lógica e regras em BIRL (cérebro)
+  color: "006b75"
+
+- name: "area:gui"
+  description: Interface GTK4 / Python
+  color: "1f77b4"
+
+- name: "area:build"
+  description: Script build / run.sh
+  color: "6f42c1"
+
+- name: "area:docs"
+  description: Documentação
+  color: "0075ca"
+
+- name: "area:audio"
+  description: Áudio e sons
+  color: "fd7e14"
+
+- name: "area:arte"
+  description: Retratos e assets visuais
+  color: "e9967a"
+
+- name: "priority:alta"
+  description: Prioridade alta
+  color: "d73a4a"
+
+- name: "priority:media"
+  description: Prioridade média
+  color: "fbca04"
+
+- name: "priority:baixa"
+  description: Prioridade baixa
+  color: "0e8a16"
+
+- name: "triage"
+  description: Precisa de triagem
+  color: "c7def8"
+
+- name: "ignore-for-release"
+  description: Não incluir nas notas de release
+  color: "ffffff"
