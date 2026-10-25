@@ -1,0 +1,55 @@
+name: Novo Jogo
+description: Proposta de inclusão de um novo jogo no BIRL Arcade
+labels: ["enhancement", "jogo:novo", "triage"]
+body:
+  - type: textarea
+    id: nome
+    attributes:
+      label: Nome do jogo
+      description: Ex.: RPG de Combate, Pong, etc.
+    validations:
+      required: true
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição
+      description: O que o jogo faz e qual o tema de academia/maromba.
+    validations:
+      required: true
+  - type: textarea
+    id: logica
+    attributes:
+      label: Lógica em BIRL
+      description: Quais regras, estado e IA ficarão no BIRL (cérebro)? Não use sorteio onde inteligência for necessária.
+    validations:
+      required: true
+  - type: textarea
+    id: controles
+    attributes:
+      label: Controles
+      description: Como o jogador interage no terminal e na GUI GTK4.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Áreas envolvidas
+      options:
+        - area:birl
+        - area:gui
+        - area:build
+        - area:docs
+        - area:audio
+        - area:arte
+    validations:
+      required: true
+  - type: checkboxes
+    id: compromisso
+    attributes:
+      label: Compromisso do proponente
+      description: Marque se pretende implementar.
+      options:
+        - label: Posso enviar um PR com a implementação
+        - label: Apenas estou sugerindo a ideia
+    validations:
+      required: false

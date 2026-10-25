@@ -1,0 +1,94 @@
+name: Bug Report
+description: Reportar um bug encontrado no BIRL Arcade
+labels: ["bug", "triage"]
+body:
+  - type: textarea
+    id: descricao
+    attributes:
+      label: Descrição do bug
+      description: Descreva claramente o que está acontecendo de errado.
+    validations:
+      required: true
+  - type: dropdown
+    id: severidade
+    attributes:
+      label: Severidade
+      options:
+        - Crítico
+        - Alto
+        - Médio
+        - Baixo
+      default: "Médio"
+    validations:
+      required: true
+  - type: dropdown
+    id: jogo
+    attributes:
+      label: Jogo afetado
+      options:
+        - jogo:velha
+        - jogo:forca
+        - jogo:academia
+        - jogo:tamagotchi
+        - jogo:dungeon
+        - interface (gui)
+        - build / run.sh
+        - outro
+    validations:
+      required: true
+  - type: dropdown
+    id: modo
+    attributes:
+      label: Modo de execução
+      options:
+        - terminal
+        - grafico (GTK4)
+        - ambos
+    validations:
+      required: true
+  - type: textarea
+    id: reproducao
+    attributes:
+      label: Passos para reproduzir
+      description: Quais passos levaram ao bug?
+      placeholder: |
+        1. Rode './run.sh --terminal'
+        2. Escolha o jogo X
+        3. Digite a opção Y
+        4. Observe o erro Z
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Comportamento esperado
+      description: O que você esperava que acontecesse?
+    validations:
+      required: true
+  - type: textarea
+    id: observado
+    attributes:
+      label: Comportamento observado
+      description: O que aconteceu na prática?
+    validations:
+      required: true
+  - type: textarea
+    id: ambiente
+    attributes:
+      label: Ambiente
+      description: Versões do Pop!_OS, Node.js, Python, GTK4/PyGObject.
+      placeholder: |
+        - Pop!_OS 24.04
+        - Node 24.20.0
+        - Python 3.12.3
+        - GTK 4.14.5 / PyGObject 3.48.2
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / mensagens de erro
+      description: Cole aqui qualquer saída de erro do terminal ou da interface.
+      render: markdown
+    validations:
+      required: false
