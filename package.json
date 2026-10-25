@@ -7,7 +7,8 @@
     "build": "./build",
     "start": "./build && birl main.birl",
     "gui": "./build && python3 gui/app.py",
-    "ver-js": "./build && birl -j main.birl"
+    "ver-js": "./build && birl -j main.birl",
+    "test": "./run-tests.sh"
   },
   "keywords": [
     "birl",

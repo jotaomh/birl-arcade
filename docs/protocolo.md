@@ -42,6 +42,14 @@ bloqueia em `fs.readSync(0, ...)` e um `console.log` assíncrono poderia ficar p
 | `text` | Campo de texto livre (palavra da forca, etc.). |
 | `next` | Botão “Continuar” (envia `ok`). |
 
+### Linha `DIALOGO`
+
+| Linha | Efeito na interface |
+|---|---|
+| `DIALOGO <personagem>|<texto>` | Exibe uma caixa de diálogo com o nome do personagem e o texto. Na GUI, mostra retrato, efeito de digitação e aguarda tecla (Z/Enter) para avançar. No terminal, desenha caixa com moldura ASCII e pequeno retrato. |
+
+A interface → BIRL não envia nada de volta para `DIALOGO`; o BIRL continua a execução após a linha ser exibida.
+
 ### Chaves `DATA` conhecidas
 
 | Chave | Exemplo | Usada por |
@@ -59,6 +67,17 @@ bloqueia em `fs.readSync(0, ...)` e um `console.log` assíncrono poderia ficar p
 | `SAVE` | `SAVE treino=60 comida=60 vapo=60 hora=3` | Tamagotchi (a interface grava o JSON com timestamp) |
 | `MAPA` | `MAPA ##########...` | Dungeon (100 caracteres) |
 | `HEROI` | `HEROI hp=30 atk=5 pos=11 fase=1` | Dungeon |
+| `RETRATO` | `RETRATO frango_mutante` | ID do retrato para exibir na caixa de diálogo |
+
+### Linha `SOM`
+
+| Linha | Efeito na interface |
+|---|---|
+| `SOM <id>` | Toca o som associado ao `id`. Se o arquivo de áudio não existir, não toca nada e não dá erro. |
+
+Ids iniciais: `hora_do_show` (início do jogo/batalha e habilidade "HORA DO SHOW"), `birl` (golpe forte e crítico), `ajuda_o_maluco` (cura "AJUDA O MALUCO TA DOENTE"), `acerto`, `erro`, `vitoria`, `derrota`.
+
+O manifesto de áudio fica em `assets/audio/manifest.txt` ligando cada `id` ao nome do arquivo. A interface toca o som em segundo plano (não trava o jogo). Tecla `M` muta/desmuta.
 
 Valores compostos usam `chave=valor` separados por espaço; listas usam `|` e `=`:
 `DATA OPCOES 1=TREINAR PESADO|2=COMER FRANGO|0=SAIR`.
