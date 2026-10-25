@@ -19,12 +19,13 @@ else
 fi
 
 # Função auxiliar: roda o BIRL com entradas e verifica se contém uma string.
+# $entradas deve ser uma string com cada entrada em uma linha separada por \n.
 verificar_saida() {
   local jogo="$1"
   local entradas="$2"
   local esperado="$3"
   local saida
-  saida=$(printf '%s\n' "$entradas" | timeout 20 node node_modules/birl-js/index.js main.birl 2>&1 || true)
+  saida=$(printf '%b\n' "$entradas" | timeout 20 node node_modules/birl-js/index.js main.birl 2>&1 || true)
   if echo "$saida" | grep -qF "$esperado"; then
     echo "OK: $jogo -> contém '$esperado'"
   else
@@ -37,19 +38,19 @@ verificar_saida() {
 }
 
 echo "==> Teste: Jogo da Velha..."
-verificar_saida "velha" "1 4 0" "JOGO DA VELHA"
+verificar_saida "velha" $'1\n4\n0' "JOGO DA VELHA"
 
 echo "==> Teste: Forca..."
-verificar_saida "forca" "2 SUPINO" "FORCA"
+verificar_saida "forca" $'2\nSUPINO' "FORCA"
 
 echo "==> Teste: Academia..."
-verificar_saida "academia" "3 1 5 0" "SIMULADOR DE ACADEMIA"
+verificar_saida "academia" $'3\n1\n5\n0' "SIMULADOR DE ACADEMIA"
 
 echo "==> Teste: Tamagotchi..."
-verificar_saida "tamagotchi" "4 0" "TAMAGOTCHI DO MONSTRO"
+verificar_saida "tamagotchi" $'4\n0' "TAMAGOTCHI DO MONSTRO"
 
-echo "==> Teste: Dungeon..."
-verificar_saida "dungeon" "5 Q" "DUNGEON DA ACADEMIA"
+echo "==> Teste: Dungeon RPG..."
+verificar_saida "dungeon" $'5\n1' "DUNGEON DA ACADEMIA RPG"
 
 echo ""
 if [ "$ERROS" -eq 0 ]; then
