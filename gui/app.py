@@ -49,6 +49,10 @@ window { background: #14161a; }
 .item { color: #6ee7a8; font-weight: 800; }
 .saida { color: #7dd3fc; font-weight: 800; }
 button.acao { padding: 8px 10px; }
+.dialogo { background: #1e2229; border: 3px solid #ffcc33; border-radius: 10px; padding: 12px; }
+.dialogo-nome { font-size: 16px; font-weight: 800; color: #ffcc33; }
+.dialogo-texto { font-size: 14px; color: #d7dde5; font-family: monospace; white-space: pre-wrap; }
+.dialogo-retrato { min-width: 64px; min-height: 64px; border: 2px solid #444; border-radius: 4px; }
 """
 
 
@@ -187,6 +191,18 @@ class GamePage(Gtk.Box):
         self.prompt_atual: tuple[str, str] | None = None
         self.encerrado = False
         self._buffer_prompt = ""
+        # Dialogo (Undertale/Pokemon style)
+        self.dialogo_ativo = False
+        self.dialogo_personagem = ""
+        self.dialogo_texto_completo = ""
+        self.dialogo_texto_atual = ""
+        self.dialogo_indice = 0
+        self.dialogo_timer = None
+        self.dialogo_velocidade = 30  # ms por letra
+        self.dialogo_widget = None
+        self.dialogo_nome_label = None
+        self.dialogo_texto_label = None
+        self.dialogo_retrato = None
 
         self.set_margin_top(12)
         self.set_margin_bottom(12)
@@ -234,6 +250,40 @@ class GamePage(Gtk.Box):
         self.entrada.connect("activate", self._ao_enviar_entrada)
         self.entrada.set_visible(False)
         lado.append(self.entrada)
+
+        # Caixa de dialogo (Undertale/Pokemon style) - inicialmente escondida
+        self.dialogo_widget = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        self.dialogo_widget.add_css_class("dialogo")
+        self.dialogo_widget.set_hexpand(True)
+        self.dialogo_widget.set_vexpand(False)
+        self.dialogo_widget.set_visible(False)
+
+        self.dialogo_retrato = Gtk.Label(label="?")
+        self.dialogo_retrato.add_css_class("dialogo-retrato")
+        self.dialogo_retrato.set_halign(Gtk.Align.START)
+        self.dialogo_retrato.set_valign(Gtk.Align.START)
+        self.dialogo_widget.append(self.dialogo_retrato)
+
+        texto_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        texto_box.set_hexpand(True)
+        self.dialogo_nome_label = Gtk.Label(label="")
+        self.dialogo_nome_label.add_css_class("dialogo-nome")
+        self.dialogo_nome_label.set_xalign(0)
+        texto_box.append(self.dialogo_nome_label)
+        self.dialogo_texto_label = Gtk.Label(label="")
+        self.dialogo_texto_label.add_css_class("dialogo-texto")
+        self.dialogo_texto_label.set_xalign(0)
+        self.dialogo_texto_label.set_halign(Gtk.Align.START)
+        texto_box.append(self.dialogo_texto_label)
+        self.dialogo_widget.append(texto_box)
+
+        dica = Gtk.Label(label="(Z ou Enter para avancar)")
+        dica.add_css_class("stat")
+        dica.set_xalign(1)
+        dica.set_hexpand(True)
+        texto_box.append(dica)
+
+        lado.append(self.dialogo_widget)
 
         self.botao_voltar = Gtk.Button(label="Voltar ao menu")
         self.botao_voltar.set_visible(False)
@@ -285,6 +335,10 @@ class GamePage(Gtk.Box):
             self._ao_fim_jogo(linha[4:])
         elif linha.startswith("END"):
             self._ao_fim_jogo("")
+        elif linha.startswith("DIALOGO "):
+            resto = linha[8:]
+            personagem, _, texto = resto.partition("|")
+            self._iniciar_dialogo(personagem, texto)
 
     def _ao_dado(self, bruto: str) -> None:
         chave, _, valor = bruto.partition(" ")
@@ -343,28 +397,61 @@ class GamePage(Gtk.Box):
             self.acoes.remove(filho)
         self.entrada.set_visible(False)
 
-    def _botao_acao(self, rotulo: str, valor: str) -> Gtk.Button:
-        botao = Gtk.Button(label=rotulo)
-        botao.add_css_class("acao")
-        botao.connect("clicked", lambda _b, v=valor: self._enviar(v))
-        self.acoes.append(botao)
-        return botao
+    def _iniciar_dialogo(self, personagem: str, texto: str) -> None:
+        if self.dialogo_timer is not None:
+            GLib.source_remove(self.dialogo_timer)
+            self.dialogo_timer = None
+        self.dialogo_ativo = True
+        self.dialogo_personagem = personagem
+        self.dialogo_texto_completo = texto
+        self.dialogo_texto_atual = ""
+        self.dialogo_indice = 0
+        self.dialogo_widget.set_visible(True)
+        self.dialogo_nome_label.set_label(personagem)
+        caminho = self.raiz / "assets" / "portraits" / f"{personagem}.png"
+        if caminho.exists():
+            self.dialogo_retrato.set_visible(False)
+            self.dialogo_retrato.set_label(personagem[0].upper())
+        else:
+            self.dialogo_retrato.set_visible(True)
+            self.dialogo_retrato.set_label(personagem[0].upper() if personagem else "?")
+        self._digitar_letra()
 
-    def _enviar(self, valor: str) -> None:
-        if self.motor is None or self.encerrado:
+    def _digitar_letra(self) -> None:
+        if not self.dialogo_ativo:
             return
-        self._limpar_acoes()
-        self.motor.enviar_input(valor)
+        if self.dialogo_indice < len(self.dialogo_texto_completo):
+            self.dialogo_texto_atual = self.dialogo_texto_completo[: self.dialogo_indice + 1]
+            self.dialogo_texto_label.set_label(self.dialogo_texto_atual)
+            self.dialogo_indice += 1
+            self.dialogo_timer = GLib.timeout_add(
+                self.dialogo_velocidade, self._digitar_letra
+            )
+        else:
+            self.dialogo_timer = None
 
-    def _ao_enviar_entrada(self, _entry) -> None:
-        texto = self.entrada.get_text().strip()
-        if not texto:
+    def _avancar_dialogo(self) -> None:
+        if not self.dialogo_ativo:
             return
-        self.entrada.set_text("")
-        self._enviar(texto)
+        if self.dialogo_timer is not None:
+            GLib.source_remove(self.dialogo_timer)
+            self.dialogo_timer = None
+            self.dialogo_texto_atual = self.dialogo_texto_completo
+            self.dialogo_texto_label.set_label(self.dialogo_texto_atual)
+            self.dialogo_indice = len(self.dialogo_texto_completo)
+        else:
+            self.dialogo_ativo = False
+            self.dialogo_widget.set_visible(False)
+            self.dialogo_texto_atual = ""
+            self.dialogo_texto_label.set_label("")
 
     def _ao_tecla(self, _ctrl, tecla, _codigo, _mods) -> bool:
         if self.encerrado:
+            return False
+        if self.dialogo_ativo:
+            if tecla in (Gdk.KEY_z, Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_space):
+                self._avancar_dialogo()
+                return True
             return False
         if self.prompt_atual and self.prompt_atual[0] == "move":
             mapa = {Gdk.KEY_w: "w", Gdk.KEY_a: "a", Gdk.KEY_s: "s", Gdk.KEY_d: "d", Gdk.KEY_q: "q"}
