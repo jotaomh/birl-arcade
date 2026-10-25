@@ -22,7 +22,7 @@ continua existindo e usa exatamente a mesma lógica.
 | 2 | Força do Bambam | O Bambam adivinha sua palavra filtrando dicionário e frequência de letras |
 | 3 | Simulador de Academia | Fadiga, recuperação, sobrecarga progressiva, dieta e lesão por regra |
 | 4 | Tamagotchi do Monstro | Estado evolui pelo tempo real desde o último save |
-| 5 | Dungeon da Academia | Fases desenhadas à mão, inimigos perseguem com BFS, combate por fórmula |
+| 5 | Dungeon da Academia RPG | Fases desenhadas à mão, inimigos perseguem com BFS, combate por turnos com d20, personagens jogáveis, progressão XP/nível |
 
 ## Requisitos (Pop!_OS 24.04)
 
@@ -32,7 +32,7 @@ continua existindo e usa exatamente a mesma lógica.
 
 ```bash
 sudo apt update
-sudo apt install -y nodejs npm python3-gi python3-gi-cairo gir1.2-gtk-4.0
+sudo apt install -y nodejs npm python3-gi python3-gi-cairo gir1.2-gtk-4.0 pulseaudio-utils alsa-utils
 ```
 
 Se o Node do apt estiver velho, use o nvm:
@@ -88,14 +88,16 @@ npm run ver-js
   `5` descanso, `0` sair.
 - Tamagotchi: `1` treinar, `2` alimentar, `3` whey/vapo, `4` descansar,
   `5` ignorar (murcha mais rápido), `0` sair.
-- Dungeon: `W/A/S/D` para mover, `Q` para sair. Combate é automático ao
-  entrar na célula do inimigo.
+- Dungeon: `W/A/S/D` para mover, `Q` para sair. Combate por turnos: `1` atacar, `2` habilidade, `3` item, `4` fugir. No combate do Toguro, escolha porcentagem de poder (20/50/80/100).
 - `Ctrl+D` encerra.
 
 ### Gráfico
+
 - Clique nos botões de ação ou use o teclado.
 - Na velha, clique na casa.
-- Na dungeon, use `W/A/S/D` ou o D-pad.
+- Na dungeon, use `W/A/S/D` ou o D-pad para mover, `1`/`2`/`3`/`4` para ações de combate.
+- Em diálogos, aperte `Z` ou `Enter` para avançar.
+- `M` para mutar/desmutar o áudio.
 - O botão **< Menu** encerra o processo BIRL daquela partida.
 
 ## Estrutura
@@ -110,11 +112,16 @@ birl/                 # fontes BIRL (um arquivo por jogo + núcleo + menu)
   50_dungeon.birl
 build                 # junta birl/*.birl em main.birl (HORA DO SHOW + RODA + BIRL)
 main.birl             # GERADO pelo build; versionado para rodar sem build
-gui/                  # somente interface: processo filho, widgets e save do pet
+gui/                  # somente interface: processo filho, widgets, dialogos e audio
+assets/               # retratos (portraits/) e audio (ignorados no git)
+  portraits/          # PNGs de retratos (64x64 recomendado)
+  audio/              # .ogg/.wav + manifest.txt (ignorados no git)
 docs/protocolo.md     # protocolo GUI <-> BIRL
 docs/notas-birl.md    # limitações e contornos da linguagem
 saves/                # JSON de save (ignorado no git)
 run.sh                # inicia modo terminal ou gráfico
+run-tests.sh          # testes de regressão
+.github/              # templates, labels, CI, dependabot, codeowners
 ```
 
 ### Por que `main.birl` é gerado e versionado?
@@ -148,5 +155,39 @@ o cabeçalho e a chamada final. O `main.birl` gerado fica versionado para que
 
 Detalhes e contornos em [`docs/notas-birl.md`](docs/notas-birl.md) e o protocolo
 completo em [`docs/protocolo.md`](docs/protocolo.md).
+
+## Personagens jogáveis (Dungeon RPG)
+
+| Personagem | Estilo | Habilidades |
+|---|---|---|
+| Bambam | Tank (muita HP e força) | BIRL! (golpe forte), AJUDA O MALUCO TA DOENTE (cura), HORA DO SHOW (buff atk) |
+| Toguro | Porcentagem de poder | Escolha 20%/50%/80%/100% de força por turno (maior dano = maior custo de Pump e vida) |
+| Felipe | Suporte (equilibrado) | Motivação (cura + buff atk), Ficha de Treino (debuff no inimigo) |
+
+## Como adicionar um inimigo
+
+No arquivo `birl/50_dungeon.birl`, na função `D_INIM_CADASTRAR`, adicione um novo bloco:
+
+```
+ELE QUE A GENTE QUER? T_I == "id_do_inimigo"
+  D_INIM_ID = "id_do_inimigo"
+  D_INIM_NOME = "NOME DO INIMIGO"
+  D_INIM_HP = <vida>
+  D_INIM_HP_MAX = <vida maxima>
+  D_INIM_DEF = <defesa>
+  D_INIM_DADO = <dado de dano>
+  D_INIM_XP = <xp concedido>
+  D_INIM_LOOT = <loot concedido>
+  D_INIM_FALA = "frase do inimigo"
+BIRL
+```
+
+Os valores são fáceis de ajustar para balanceamento posterior.
+
+## Créditos de arte e áudio
+
+- Retratos: `assets/portraits/<id>.png` (padrão 64x64). Placeholder gerado se o arquivo não existir.
+- Áudio: `assets/audio/` (ignorados no git). Fornecidos pelo usuário. Veja `assets/audio/README.md`.
+- Nenhuma arte ou áudio de terceiros (anime, jogos, pessoas reais) é usada ou baixada pelo projeto.
 
 Sai de casa codei pra caralho!™
