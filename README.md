@@ -19,7 +19,7 @@ continua existindo e usa exatamente a mesma lógica.
 | # | Jogo | Inteligência / regra |
 |---|------|----------------------|
 | 1 | Jogo da Velha vs Bambam | Minimax com níveis de profundidade (impossível no nível 3) |
-| 2 | Força do Bambam | O Bambam adivinha sua palavra filtrando dicionário e frequência de letras |
+| 2 | Força do Bambam | O Bambam adivinha sua palavra filtrando dicionário e frequência de letras. Palavra secreta validada (2-15 letras, A-Z). Dicionário com centenas de palavras em português. |
 | 3 | Simulador de Academia | Fadiga, recuperação, sobrecarga progressiva, dieta e lesão por regra |
 | 4 | Tamagotchi do Monstro | Estado evolui pelo tempo real desde o último save |
 | 5 | Dungeon da Academia RPG | Fases desenhadas à mão, inimigos perseguem com BFS, combate por turnos com d20, personagens jogáveis, progressão XP/nível |
@@ -83,7 +83,7 @@ npm run ver-js
 ### Terminal
 - Digite a opção e aperte **Enter**.
 - Velha: escolha uma casa de `0` a `8`.
-- Força: digite a palavra secreta; o Bambam chuta uma letra por vez.
+- Força: digite a palavra secreta (2-15 letras, A-Z, sem acentos); o Bambam chuta letras por frequência, eliminando palavras impossíveis.
 - Academia: `1` treino pesado, `2` treino leve, `3` cardio, `4` refeição,
   `5` descanso, `0` sair.
 - Tamagotchi: `1` treinar, `2` alimentar, `3` whey/vapo, `4` descansar,
