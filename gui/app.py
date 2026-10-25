@@ -206,7 +206,7 @@ class GamePage(Gtk.Box):
         # Audio
         self.volume = 0.7
         self.mutado = False
-        self.audio_dir = self.raiz / "assets" / "audio"
+        self.audio_dir = RAIZ / "assets" / "audio"
         self.manifest = self._carregar_manifest()
 
         self.set_margin_top(12)
