@@ -16,12 +16,11 @@ OH O HOME AI PO FRANGO ESCREVE(MONSTRO T)
 BIRL
 
 OH O HOME AI PO FRANGO LE_LINHA(MONSTRO LIXO)
-  FRANGO BUF = Buffer.alloc(1) || 0
-  FRANGO TEXTO = ""
+  FRANGO BUF = Buffer.alloc(256) || 0
+  FRANGO POS = 0
   FRANGO FIM = 0
   NEGATIVA BAMBAM (FIM == 0)
-    FRANGO N = FS.readSync(0, BUF, 0, 1) || 0
-    FRANGO C = BUF.toString("utf8") || ""
+    FRANGO N = FS.readSync(0, BUF, POS, 1) || 0
     ELE QUE A GENTE QUER? N == 0
       ELE QUE A GENTE QUER? MODO_GUI == 1
         AJUDA O MALUCO TA DOENTE ESCREVE("END EOF")
@@ -31,16 +30,18 @@ OH O HOME AI PO FRANGO LE_LINHA(MONSTRO LIXO)
       BIRL
       process.exit(0)
     BIRL
+    FRANGO C = BUF.toString("utf8", POS, POS + 1) || ""
     ELE QUE A GENTE QUER? C == "\n"
-      FIM = 2
+      FIM = 1
     BIRL
     ELE QUE A GENTE QUER? C == "\r"
-      FIM = FIM + 0
+      FIM = 1
     BIRL
     ELE QUE A GENTE QUER? FIM == 0
-      TEXTO = TEXTO + C
+      POS = POS + 1
     BIRL
   BIRL
+  FRANGO TEXTO = BUF.toString("utf8", 0, POS) || ""
   BORA CUMPADI TEXTO
 BIRL
 
