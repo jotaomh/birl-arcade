@@ -1,7 +1,9 @@
 # BIRL Arcade
 
-Fliperama de jogos de terminal escrito na linguagem **BIRL** (`birl-js`), com tema de academia/maromba.
-Sem servidor web, sem interface gráfica, sem água com músculo: tudo roda no terminal.
+Fliperama de jogos com tema de academia/maromba. O **cérebro é 100% BIRL**
+(`birl-js` 1.0.3): estado, regras e IA. A interface gráfica é uma casca fina em
+**Python 3 + GTK4** que conversa com o BIRL por stdin/stdout. O modo terminal
+continua existindo e usa exatamente a mesma lógica.
 
 ```
   ##########################################
@@ -14,29 +16,26 @@ Sem servidor web, sem interface gráfica, sem água com músculo: tudo roda no t
 
 ## Jogos
 
-| # | Jogo | Status |
-|---|------|--------|
-| 1 | Jogo da Velha vs Bambam | pronto |
-| 2 | Simulador de Academia (RPG de texto) | pronto |
-| 3 | Tamagotchi do Monstro | pronto |
-| 4 | Dungeon da Academia (roguelike ASCII) | pronto |
+| # | Jogo | Inteligência / regra |
+|---|------|----------------------|
+| 1 | Jogo da Velha vs Bambam | Minimax com níveis de profundidade (impossível no nível 3) |
+| 2 | Força do Bambam | O Bambam adivinha sua palavra filtrando dicionário e frequência de letras |
+| 3 | Simulador de Academia | Fadiga, recuperação, sobrecarga progressiva, dieta e lesão por regra |
+| 4 | Tamagotchi do Monstro | Estado evolui pelo tempo real desde o último save |
+| 5 | Dungeon da Academia | Fases desenhadas à mão, inimigos perseguem com BFS, combate por fórmula |
 
-Ao terminar qualquer jogo, o jogo volta para o menu principal.
+## Requisitos (Pop!_OS 24.04)
 
-## Requisitos
-
-- Node.js 18+ (testado no Node 24)
-- npm
-- Pop!_OS / Ubuntu (ou qualquer Linux com terminal)
-
-## Instalação (Pop!_OS)
+- Node.js 18+ e npm (testado com Node 24)
+- Python 3 com PyGObject e GTK 4 (testado com GTK 4.14.5 / PyGObject 3.48.2)
+- Bash
 
 ```bash
 sudo apt update
-sudo apt install -y nodejs npm
+sudo apt install -y nodejs npm python3-gi python3-gi-cairo gir1.2-gtk-4.0
 ```
 
-Se o Node do apt estiver muito velho, use o nvm:
+Se o Node do apt estiver velho, use o nvm:
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
@@ -44,7 +43,7 @@ source ~/.bashrc
 nvm install --lts
 ```
 
-Depois, no diretório do projeto:
+Dependências do projeto:
 
 ```bash
 npm install
@@ -52,63 +51,102 @@ npm install
 
 ## Como rodar
 
+Modo terminal (padrão):
+
 ```bash
+./run.sh
+# ou
+./run.sh --terminal
+# ou
 npm start
 ```
 
-ou diretamente:
+Modo gráfico:
 
 ```bash
-npx birl main.birl
+./run.sh --gui
+# ou
+npm run gui
 ```
+
+O `run.sh` primeiro executa o `build`, que junta os arquivos de `birl/` em
+`main.birl`, e depois inicia o modo escolhido.
 
 Para ver o JavaScript gerado pelo transpilador:
 
 ```bash
-npx birl -j main.birl
+npm run ver-js
 ```
 
 ## Controles
 
-- Digite o número da opção e aperte **Enter**.
-- Jogo da velha: escolha uma casa de `0` a `8` (a posição aparece no tabuleiro).
-- Simulador de Academia: `1` treinar, `2` comer frango, `3` whey, `4` descansar, `0` sair.
-- Tamagotchi: `1` treinar, `2` alimentar, `3` whey/vapo, `4` ignorar (murcha mais rápido), `0` sair.
-- Dungeon: `W` cima, `A` esquerda, `S` baixo, `D` direita, `Q` sair. Aperte **Enter** para atacar nas batalhas.
-- `Ctrl+D` (fim da entrada) encerra o fliperama.
+### Terminal
+- Digite a opção e aperte **Enter**.
+- Velha: escolha uma casa de `0` a `8`.
+- Força: digite a palavra secreta; o Bambam chuta uma letra por vez.
+- Academia: `1` treino pesado, `2` treino leve, `3` cardio, `4` refeição,
+  `5` descanso, `0` sair.
+- Tamagotchi: `1` treinar, `2` alimentar, `3` whey/vapo, `4` descansar,
+  `5` ignorar (murcha mais rápido), `0` sair.
+- Dungeon: `W/A/S/D` para mover, `Q` para sair. Combate é automático ao
+  entrar na célula do inimigo.
+- `Ctrl+D` encerra.
+
+### Gráfico
+- Clique nos botões de ação ou use o teclado.
+- Na velha, clique na casa.
+- Na dungeon, use `W/A/S/D` ou o D-pad.
+- O botão **< Menu** encerra o processo BIRL daquela partida.
 
 ## Estrutura
 
 ```
-main.birl        # menu + todos os jogos (100% da lógica)
-package.json     # apenas metadados e scripts npm
-README.md
+birl/                 # fontes BIRL (um arquivo por jogo + núcleo + menu)
+  00_core.birl        # protocolo, leitura/escrita, menu e despacho
+  10_velha.birl
+  20_forca.birl
+  30_academia.birl
+  40_tamagotchi.birl
+  50_dungeon.birl
+build                 # junta birl/*.birl em main.birl (HORA DO SHOW + RODA + BIRL)
+main.birl             # GERADO pelo build; versionado para rodar sem build
+gui/                  # somente interface: processo filho, widgets e save do pet
+docs/protocolo.md     # protocolo GUI <-> BIRL
+docs/notas-birl.md    # limitações e contornos da linguagem
+saves/                # JSON de save (ignorado no git)
+run.sh                # inicia modo terminal ou gráfico
 ```
 
-### Por que tudo em um único `main.birl`?
+### Por que `main.birl` é gerado e versionado?
 
-A linguagem BIRL (`birl-js` 1.0.3) **não possui `import`, `require` de outros arquivos `.birl` nem
-módulos**. Cada programa precisa começar com `HORA DO SHOW` e terminar com `BIRL`, e o
-transpilador gera um único script JavaScript. Por isso cada jogo é uma função dentro de
-`main.birl`, o que mantém 100% da lógica em BIRL. Se no futuro a linguagem ganhar módulos,
-os blocos já estão separados por funções e podem ser movidos para arquivos próprios.
+O BIRL não tem `import` nem módulos: todo programa precisa começar com
+`HORA DO SHOW` e terminar com `BIRL`. Para manter os jogos separados no
+desenvolvimento, `build` concatena `birl/*.birl` na ordem numérica e adiciona
+o cabeçalho e a chamada final. O `main.birl` gerado fica versionado para que
+`npx birl main.birl` funcione sem rodar o build; se você editar `birl/`, rode
+`./build` antes de testar.
 
-## Curiosidades da linguagem (descobertas na prática)
+### Regra de arquitetura
 
-- Variáveis: `FRANGO nome = "valor"` (tipos são só água com músculo).
-- Imprimir: `CE QUER VER ESSA PORRA?(...)`.
-- Se: `ELE QUE A GENTE QUER? condicao ... BIRL` (sem parênteses na condição!).
-- Senão: `NAO VAI DAR NAO ... BIRL`; senão-se: `QUE NAO VAI DAR O QUE? cond ...`.
-- Laço: `NEGATIVA BAMBAM (condicao) ... BIRL`.
-- Funções: `OH O HOME AI PO TIPO NOME(TIPO A) ... BORA CUMPADI A BIRL` — **precisa de pelo menos 1 parâmetro**.
-- Chamar função: `AJUDA O MALUCO TA DOENTE NOME(1)`.
-- Números aleatórios: `Math.random()` / `Math.floor(...)` (via JS), com auxílio de `|| 0`.
-- Leitura de teclado: `fs.readSync(0, ...)` byte a byte (a linguagem não tem `input()`).
-- Sem comentários (`//` quebra o parser) e `>=` / `<=` têm bug na gramática: use `>` / `<`.
-- **Não existe precedência de operadores**: tudo é avaliado da esquerda para a direita.
-  Por isso cálculos mistos usam variáveis temporárias.
-- Atribuir uma variável a outra exige uma operação: `B = A + 0` (não existe `B = A`).
-- Arrays não aceitam leitura por índice (`A[1]`); use `.charAt()` em strings ou `.splice()`/`.join()`.
-- Chamada de função dentro de `BORA CUMPADI` diretamente não funciona: atribua a uma variável antes.
+- **BIRL**: estado, regras, validação, IA (minimax, filtragem de dicionário,
+  BFS), cálculos de tempo e combate.
+- **Python/GTK4**: desenhar janela, coletar cliques/teclas, executar o BIRL
+  como processo filho e traduzir o protocolo de linhas. Nenhuma regra de jogo.
+- **Bash**: `build` e `run.sh`.
+- **JSON**: apenas o save do Tamagotchi, gravado pela interface com timestamp.
+
+## Limitações do BIRL (resumo)
+
+- Sem `import`/módulos e sem comentários (`//` quebra o parser).
+- `>=` e `<=` têm bug: use `>` e `<`.
+- Sem precedência de operadores: tudo é avaliado da esquerda para a direita.
+- Condições não aceitam chamada de função nem acesso a membro direto.
+- Métodos em literais (`"abc".split("")`) não compilam; atribua antes.
+- `0 + string` concatena `"0"`; use `|| ""` para strings e `|| 0` para números.
+- Arrays não aceitam índice; use `shift()`/`push()` ou strings com `charAt`.
+- `JSON.stringify` com objeto literal não compila; o save é montado por concatenação.
+
+Detalhes e contornos em [`docs/notas-birl.md`](docs/notas-birl.md) e o protocolo
+completo em [`docs/protocolo.md`](docs/protocolo.md).
 
 Sai de casa codei pra caralho!™

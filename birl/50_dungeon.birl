@@ -1,0 +1,542 @@
+FRANGO D_M1 = "###########@.......##..##....##..#.....##..#..F..##........##....##..##.C..#...##....#..E###########"
+FRANGO D_M2 = "##########@...#...##.##.#.#.#.#.#..#.#.#.#.##.#.#..#.#.#.#.#.#.##.#.#...#F...##.#.W....#E##########"
+FRANGO D_M3 = "###########@.......##.#####.###.....#..##.###.#.F##.#...#..##.#.###..##.#...F..##..C....E###########"
+
+FRANGO D_GRID = ""
+FRANGO D_HITS = ""
+FRANGO D_HX = 1
+FRANGO D_HY = 1
+FRANGO D_HP = 30
+FRANGO D_ATK = 3
+FRANGO D_FASE = 1
+FRANGO D_FIM = 0
+
+OH O HOME AI PO MONSTRO D_REP(MONSTRO C, MONSTRO N)
+  FRANGO NN = N + 0
+  FRANGO R = ""
+  FRANGO K = 0
+  NEGATIVA BAMBAM (K < NN)
+    R = R + C
+    K = K + 1
+  BIRL
+  BORA CUMPADI R
+BIRL
+
+OH O HOME AI PO MONSTRO D_SET1(MONSTRO S, MONSTRO I, MONSTRO C)
+  FRANGO T = 0 + S.length
+  FRANGO II = I + 0
+  FRANGO R = ""
+  FRANGO K = 0
+  NEGATIVA BAMBAM (K < T)
+    FRANGO CH = S.charAt(K) || ""
+    FRANGO CHC = CH + ""
+    ELE QUE A GENTE QUER? K == II
+      R = R + C
+    NAO VAI DAR NAO
+      R = R + CHC
+    BIRL
+    K = K + 1
+  BIRL
+  BORA CUMPADI R
+BIRL
+
+OH O HOME AI PO FRANGO D_ACHA(MONSTRO S, MONSTRO C)
+  FRANGO T = 0 + S.length
+  FRANGO K = 0
+  FRANGO ACHOU = 100
+  NEGATIVA BAMBAM (K < T)
+    FRANGO CH = S.charAt(K) || ""
+    FRANGO CHC = CH + ""
+    ELE QUE A GENTE QUER? CHC == C
+      ELE QUE A GENTE QUER? ACHOU == 100
+        ACHOU = K + 0
+      BIRL
+    BIRL
+    K = K + 1
+  BIRL
+  BORA CUMPADI ACHOU
+BIRL
+
+OH O HOME AI PO FRANGO D_CONT(MONSTRO S, MONSTRO C)
+  FRANGO T = 0 + S.length
+  FRANGO K = 0
+  FRANGO N = 0
+  NEGATIVA BAMBAM (K < T)
+    FRANGO CH = S.charAt(K) || ""
+    FRANGO CHC = CH + ""
+    ELE QUE A GENTE QUER? CHC == C
+      N = N + 1
+    BIRL
+    K = K + 1
+  BIRL
+  BORA CUMPADI N
+BIRL
+
+OH O HOME AI PO FRANGO D_MAN(MONSTRO A, MONSTRO B)
+  FRANGO AA = A + 0
+  FRANGO BB = B + 0
+  FRANGO AX = AA % 10
+  FRANGO ABASE = AA - AX
+  FRANGO AY = ABASE / 10
+  FRANGO BX = BB % 10
+  FRANGO BBASE = BB - BX
+  FRANGO BY = BBASE / 10
+  FRANGO DX = AX - BX
+  ELE QUE A GENTE QUER? DX < 0
+    DX = 0 - DX
+  BIRL
+  FRANGO DY = AY - BY
+  ELE QUE A GENTE QUER? DY < 0
+    DY = 0 - DY
+  BIRL
+  FRANGO SOMA = DX + DY
+  BORA CUMPADI SOMA
+BIRL
+
+OH O HOME AI PO FRANGO D_LIVRE(MONSTRO S, MONSTRO P)
+  FRANGO PP = P + 0
+  ELE QUE A GENTE QUER? PP < 0
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? PP > 99
+    BORA CUMPADI 0
+  BIRL
+  FRANGO C = S.charAt(PP) || "#"
+  FRANGO CC = C + ""
+  ELE QUE A GENTE QUER? CC == "#"
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? CC == "E"
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? CC == "W"
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? CC == "C"
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? CC == "F"
+    BORA CUMPADI 0
+  BIRL
+  BORA CUMPADI 1
+BIRL
+
+OH O HOME AI PO MONSTRO D_PASSO(MONSTRO S, MONSTRO DE, MONSTRO PARA)
+  FRANGO D = DE + 0
+  FRANGO ALVO = PARA + 0
+  ELE QUE A GENTE QUER? D == ALVO
+    BORA CUMPADI ""
+  BIRL
+  FRANGO VIS = AJUDA O MALUCO TA DOENTE D_REP("0", 100)
+  FRANGO FIRST = AJUDA O MALUCO TA DOENTE D_REP(".", 100)
+  VIS = AJUDA O MALUCO TA DOENTE D_SET1(VIS, D, "1")
+  FRANGO DSTR = "" + D
+  FRANGO Q = DSTR.split("|") || 0
+  FRANGO QN = 0 + Q.length
+  FRANGO RES = ""
+  NEGATIVA BAMBAM (QN > 0)
+    FRANGO CEL = Q.shift() || ""
+    FRANGO CELC = CEL + ""
+    FRANGO CELL = 0 + CELC.length
+    ELE QUE A GENTE QUER? CELL > 0
+      FRANGO P = 0 + parseInt(CELC, 10)
+      FRANGO PX = P % 10
+      FRANGO PBASE = P - PX
+      FRANGO PY = PBASE / 10
+      FRANGO N1 = P - 10
+      ELE QUE A GENTE QUER? PY > 0
+        FRANGO OK1 = AJUDA O MALUCO TA DOENTE D_LIVRE(S, N1)
+        ELE QUE A GENTE QUER? OK1 == 1
+          FRANGO V1 = VIS.charAt(N1) || "1"
+          FRANGO V1C = V1 + ""
+          ELE QUE A GENTE QUER? V1C == "0"
+            VIS = AJUDA O MALUCO TA DOENTE D_SET1(VIS, N1, "1")
+            FRANGO DIR1 = "W"
+            ELE QUE A GENTE QUER? P != D
+              FRANGO FD1 = FIRST.charAt(P) || "."
+              DIR1 = FD1 + ""
+            BIRL
+            FIRST = AJUDA O MALUCO TA DOENTE D_SET1(FIRST, N1, DIR1)
+            Q.push("" + N1)
+            ELE QUE A GENTE QUER? N1 == ALVO
+              ELE QUE A GENTE QUER? RES == ""
+                RES = DIR1 + ""
+              BIRL
+            BIRL
+          BIRL
+        BIRL
+      BIRL
+      FRANGO N2 = P + 10
+      ELE QUE A GENTE QUER? PY < 9
+        FRANGO OK2 = AJUDA O MALUCO TA DOENTE D_LIVRE(S, N2)
+        ELE QUE A GENTE QUER? OK2 == 1
+          FRANGO V2 = VIS.charAt(N2) || "1"
+          FRANGO V2C = V2 + ""
+          ELE QUE A GENTE QUER? V2C == "0"
+            VIS = AJUDA O MALUCO TA DOENTE D_SET1(VIS, N2, "1")
+            FRANGO DIR2 = "S"
+            ELE QUE A GENTE QUER? P != D
+              FRANGO FD2 = FIRST.charAt(P) || "."
+              DIR2 = FD2 + ""
+            BIRL
+            FIRST = AJUDA O MALUCO TA DOENTE D_SET1(FIRST, N2, DIR2)
+            Q.push("" + N2)
+            ELE QUE A GENTE QUER? N2 == ALVO
+              ELE QUE A GENTE QUER? RES == ""
+                RES = DIR2 + ""
+              BIRL
+            BIRL
+          BIRL
+        BIRL
+      BIRL
+      FRANGO N3 = P - 1
+      ELE QUE A GENTE QUER? PX > 0
+        FRANGO OK3 = AJUDA O MALUCO TA DOENTE D_LIVRE(S, N3)
+        ELE QUE A GENTE QUER? OK3 == 1
+          FRANGO V3 = VIS.charAt(N3) || "1"
+          FRANGO V3C = V3 + ""
+          ELE QUE A GENTE QUER? V3C == "0"
+            VIS = AJUDA O MALUCO TA DOENTE D_SET1(VIS, N3, "1")
+            FRANGO DIR3 = "A"
+            ELE QUE A GENTE QUER? P != D
+              FRANGO FD3 = FIRST.charAt(P) || "."
+              DIR3 = FD3 + ""
+            BIRL
+            FIRST = AJUDA O MALUCO TA DOENTE D_SET1(FIRST, N3, DIR3)
+            Q.push("" + N3)
+            ELE QUE A GENTE QUER? N3 == ALVO
+              ELE QUE A GENTE QUER? RES == ""
+                RES = DIR3 + ""
+              BIRL
+            BIRL
+          BIRL
+        BIRL
+      BIRL
+      FRANGO N4 = P + 1
+      ELE QUE A GENTE QUER? PX < 9
+        FRANGO OK4 = AJUDA O MALUCO TA DOENTE D_LIVRE(S, N4)
+        ELE QUE A GENTE QUER? OK4 == 1
+          FRANGO V4 = VIS.charAt(N4) || "1"
+          FRANGO V4C = V4 + ""
+          ELE QUE A GENTE QUER? V4C == "0"
+            VIS = AJUDA O MALUCO TA DOENTE D_SET1(VIS, N4, "1")
+            FRANGO DIR4 = "D"
+            ELE QUE A GENTE QUER? P != D
+              FRANGO FD4 = FIRST.charAt(P) || "."
+              DIR4 = FD4 + ""
+            BIRL
+            FIRST = AJUDA O MALUCO TA DOENTE D_SET1(FIRST, N4, DIR4)
+            Q.push("" + N4)
+            ELE QUE A GENTE QUER? N4 == ALVO
+              ELE QUE A GENTE QUER? RES == ""
+                RES = DIR4 + ""
+              BIRL
+            BIRL
+          BIRL
+        BIRL
+      BIRL
+    BIRL
+    QN = 0 + Q.length
+  BIRL
+  BORA CUMPADI RES
+BIRL
+
+OH O HOME AI PO MONSTRO D_HITS_INIT(MONSTRO S, MONSTRO FASE)
+  FRANGO FF = FASE + 0
+  FRANGO HP = 6 + FF
+  FRANGO R = ""
+  FRANGO K = 0
+  NEGATIVA BAMBAM (K < 100)
+    FRANGO CH = S.charAt(K) || ""
+    FRANGO CHC = CH + ""
+    ELE QUE A GENTE QUER? CHC == "F"
+      R = R + HP
+    NAO VAI DAR NAO
+      R = R + "0"
+    BIRL
+    K = K + 1
+  BIRL
+  BORA CUMPADI R
+BIRL
+
+OH O HOME AI PO FRANGO D_LOAD(MONSTRO FASE)
+  FRANGO FF = FASE + 0
+  FRANGO M = D_M1 + ""
+  ELE QUE A GENTE QUER? FF == 2
+    M = D_M2 + ""
+  BIRL
+  ELE QUE A GENTE QUER? FF == 3
+    M = D_M3 + ""
+  BIRL
+  D_GRID = M + ""
+  D_FASE = FF + 0
+  FRANGO HPOS = AJUDA O MALUCO TA DOENTE D_ACHA(M, "@")
+  FRANGO POS = HPOS + 0
+  FRANGO PX = POS % 10
+  FRANGO PBASE = POS - PX
+  FRANGO PY = PBASE / 10
+  D_HX = PX + 0
+  D_HY = PY + 0
+  D_HITS = AJUDA O MALUCO TA DOENTE D_HITS_INIT(M, FF)
+  BORA CUMPADI 0
+BIRL
+
+OH O HOME AI PO FRANGO D_ESTADO(MONSTRO LIXO)
+  FRANGO HS = "hp=" + D_HP + " atk=" + D_ATK + " fase=" + D_FASE + " x=" + D_HX + " y=" + D_HY
+  AJUDA O MALUCO TA DOENTE DADO("HEROI " + HS)
+  AJUDA O MALUCO TA DOENTE DADO("MAPA " + D_GRID)
+  BORA CUMPADI 0
+BIRL
+
+OH O HOME AI PO FRANGO D_DESENHA(MONSTRO LIXO)
+  ELE QUE A GENTE QUER? MODO_GUI == 0
+    AJUDA O MALUCO TA DOENTE LIMPA(0)
+    AJUDA O MALUCO TA DOENTE CABECALHO(0)
+    AJUDA O MALUCO TA DOENTE TEXTO("")
+    AJUDA O MALUCO TA DOENTE TEXTO("  DUNGEON DA ACADEMIA - FASE " + D_FASE + "/3")
+    AJUDA O MALUCO TA DOENTE TEXTO("  HP: " + D_HP + "   ATK: " + D_ATK)
+    AJUDA O MALUCO TA DOENTE TEXTO("")
+    FRANGO I = 0
+    NEGATIVA BAMBAM (I < 10)
+      FRANGO B = I * 10
+      FRANGO E = B + 10
+      FRANGO L = D_GRID.substring(B, E) || ""
+      FRANGO LC = L + ""
+      AJUDA O MALUCO TA DOENTE TEXTO("  " + LC)
+      I = I + 1
+    BIRL
+    AJUDA O MALUCO TA DOENTE TEXTO("")
+    AJUDA O MALUCO TA DOENTE TEXTO("  @ VOCE   F INIMIGO   E SAIDA   W WHEY(+ATK)   C COMIDA(+HP)")
+  BIRL
+  BORA CUMPADI 0
+BIRL
+
+OH O HOME AI PO FRANGO D_INIMIGOS_AGEM(MONSTRO LIXO)
+  FRANGO POSSTR = ""
+  FRANGO K = 0
+  NEGATIVA BAMBAM (K < 100)
+    FRANGO CH = D_GRID.charAt(K) || ""
+    FRANGO CHC = CH + ""
+    ELE QUE A GENTE QUER? CHC == "F"
+      POSSTR = POSSTR + K + "|"
+    BIRL
+    K = K + 1
+  BIRL
+  FRANGO ARR = POSSTR.split("|") || 0
+  FRANGO AN = 0 + ARR.length
+  NEGATIVA BAMBAM (AN > 0)
+    FRANGO TOK = ARR.shift() || ""
+    FRANGO TOKC = TOK + ""
+    FRANGO TL = 0 + TOKC.length
+    ELE QUE A GENTE QUER? TL > 0
+      FRANGO EP = 0 + parseInt(TOKC, 10)
+      FRANGO ECH = D_GRID.charAt(EP) || "."
+      FRANGO ECHC = ECH + ""
+      ELE QUE A GENTE QUER? ECHC == "F"
+        FRANGO HBASE = D_HY * 10
+        FRANGO HPOS = HBASE + D_HX
+        FRANGO DIST = AJUDA O MALUCO TA DOENTE D_MAN(EP, HPOS)
+        ELE QUE A GENTE QUER? DIST == 1
+          FRANGO DANO = 1 + D_FASE
+          D_HP = D_HP - DANO
+          AJUDA O MALUCO TA DOENTE TEXTO("  UM INIMIGO TE ACERTOU! -" + DANO + " HP")
+        NAO VAI DAR NAO
+          FRANGO PASSO = AJUDA O MALUCO TA DOENTE D_PASSO(D_GRID, EP, HPOS)
+          FRANGO PASSC = PASSO + ""
+          FRANGO PL = 0 + PASSC.length
+          ELE QUE A GENTE QUER? PL > 0
+            FRANGO NP = EP + 0
+            ELE QUE A GENTE QUER? PASSC == "W"
+              NP = EP - 10
+            BIRL
+            ELE QUE A GENTE QUER? PASSC == "S"
+              NP = EP + 10
+            BIRL
+            ELE QUE A GENTE QUER? PASSC == "A"
+              NP = EP - 1
+            BIRL
+            ELE QUE A GENTE QUER? PASSC == "D"
+              NP = EP + 1
+            BIRL
+            FRANGO NCH = D_GRID.charAt(NP) || "#"
+            FRANGO NCHC = NCH + ""
+            ELE QUE A GENTE QUER? NCHC == "."
+              FRANGO DIG = D_HITS.charAt(EP) || "0"
+              FRANGO DIGC = DIG + ""
+              D_GRID = AJUDA O MALUCO TA DOENTE D_SET1(D_GRID, EP, ".")
+              D_GRID = AJUDA O MALUCO TA DOENTE D_SET1(D_GRID, NP, "F")
+              D_HITS = AJUDA O MALUCO TA DOENTE D_SET1(D_HITS, NP, DIGC)
+              D_HITS = AJUDA O MALUCO TA DOENTE D_SET1(D_HITS, EP, "0")
+            BIRL
+          BIRL
+        BIRL
+      BIRL
+    BIRL
+    AN = AN - 1
+  BIRL
+  BORA CUMPADI 0
+BIRL
+
+OH O HOME AI PO FRANGO D_AGE(MONSTRO OP)
+  FRANGO OPC = OP + ""
+  FRANGO TX = D_HX + 0
+  FRANGO TY = D_HY + 0
+  FRANGO DIR = ""
+  ELE QUE A GENTE QUER? OPC == "w"
+    TY = TY - 1
+    DIR = "W"
+  BIRL
+  ELE QUE A GENTE QUER? OPC == "s"
+    TY = TY + 1
+    DIR = "S"
+  BIRL
+  ELE QUE A GENTE QUER? OPC == "a"
+    TX = TX - 1
+    DIR = "A"
+  BIRL
+  ELE QUE A GENTE QUER? OPC == "d"
+    TX = TX + 1
+    DIR = "D"
+  BIRL
+  ELE QUE A GENTE QUER? DIR == ""
+    AJUDA O MALUCO TA DOENTE TEXTO("  COMANDO INVALIDO. USA W, A, S OU D.")
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? TX < 0
+    AJUDA O MALUCO TA DOENTE TEXTO("  PAREDE.")
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? TX > 9
+    AJUDA O MALUCO TA DOENTE TEXTO("  PAREDE.")
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? TY < 0
+    AJUDA O MALUCO TA DOENTE TEXTO("  PAREDE.")
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? TY > 9
+    AJUDA O MALUCO TA DOENTE TEXTO("  PAREDE.")
+    BORA CUMPADI 0
+  BIRL
+  FRANGO TBASE = TY * 10
+  FRANGO ALVO = TBASE + TX
+  FRANGO HBASE = D_HY * 10
+  FRANGO HPOS = HBASE + D_HX
+  FRANGO C = D_GRID.charAt(ALVO) || "#"
+  FRANGO CC = C + ""
+  ELE QUE A GENTE QUER? CC == "#"
+    AJUDA O MALUCO TA DOENTE TEXTO("  PAREDE. O MONSTRO NAO ATRAVESSA CONCRETO.")
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? CC == "F"
+    FRANGO DG = D_HITS.charAt(ALVO) || "0"
+    FRANGO DGC = DG + ""
+    FRANGO REM = 0 + parseInt(DGC, 10)
+    FRANGO ATKT = D_ATK + 0
+    REM = REM - ATKT
+    ELE QUE A GENTE QUER? REM < 1
+      D_GRID = AJUDA O MALUCO TA DOENTE D_SET1(D_GRID, ALVO, ".")
+      D_HITS = AJUDA O MALUCO TA DOENTE D_SET1(D_HITS, ALVO, "0")
+      AJUDA O MALUCO TA DOENTE TEXTO("  NOCAUTE! O INIMIGO FOI PRO CHAO.")
+    NAO VAI DAR NAO
+      FRANGO REMS = REM + ""
+      D_HITS = AJUDA O MALUCO TA DOENTE D_SET1(D_HITS, ALVO, REMS)
+      FRANGO DANO = 1 + D_FASE
+      D_HP = D_HP - DANO
+      AJUDA O MALUCO TA DOENTE TEXTO("  VOCE ACERTOU. ELE AINDA TA DE PE E REVIDOU: -" + DANO + " HP")
+    BIRL
+    BORA CUMPADI 1
+  BIRL
+  ELE QUE A GENTE QUER? CC == "E"
+    FRANGO INIM = AJUDA O MALUCO TA DOENTE D_CONT(D_GRID, "F")
+    ELE QUE A GENTE QUER? INIM > 0
+      AJUDA O MALUCO TA DOENTE TEXTO("  A SAIDA TA TRANCADA. DERROTA TODOS OS INIMIGOS PRIMEIRO.")
+      BORA CUMPADI 0
+    BIRL
+    FRANGO FF = D_FASE + 0
+    ELE QUE A GENTE QUER? FF > 2
+      D_FIM = 1
+      AJUDA O MALUCO TA DOENTE TEXTO("  VOCE ZEROU A DUNGEON DA ACADEMIA! BIRL, MONSTRO!")
+      BORA CUMPADI 0
+    BIRL
+    FRANGO PROX = FF + 1
+    AJUDA O MALUCO TA DOENTE D_LOAD(PROX)
+    D_HP = D_HP + 10
+    ELE QUE A GENTE QUER? D_HP > 99
+      D_HP = 99
+    BIRL
+    AJUDA O MALUCO TA DOENTE TEXTO("  FASE " + PROX + " LIBERADA! +10 HP DE DESCANSO.")
+    AJUDA O MALUCO TA DOENTE TEXTO("  CUIDADO: OS INIMIGOS DESSA FASE BATEM MAIS FORTE.")
+    BORA CUMPADI 0
+  BIRL
+  ELE QUE A GENTE QUER? CC == "W"
+    D_ATK = D_ATK + 2
+    ELE QUE A GENTE QUER? D_ATK > 9
+      D_ATK = 9
+    BIRL
+    D_GRID = AJUDA O MALUCO TA DOENTE D_SET1(D_GRID, ALVO, ".")
+    AJUDA O MALUCO TA DOENTE TEXTO("  WHEY NA VEIA! +2 ATK.")
+  BIRL
+  ELE QUE A GENTE QUER? CC == "C"
+    D_HP = D_HP + 8
+    ELE QUE A GENTE QUER? D_HP > 99
+      D_HP = 99
+    BIRL
+    D_GRID = AJUDA O MALUCO TA DOENTE D_SET1(D_GRID, ALVO, ".")
+    AJUDA O MALUCO TA DOENTE TEXTO("  FRANGO COM BATATA DOCE! +8 HP.")
+  BIRL
+  D_GRID = AJUDA O MALUCO TA DOENTE D_SET1(D_GRID, HPOS, ".")
+  D_GRID = AJUDA O MALUCO TA DOENTE D_SET1(D_GRID, ALVO, "@")
+  D_HX = TX + 0
+  D_HY = TY + 0
+  BORA CUMPADI 1
+BIRL
+
+OH O HOME AI PO FRANGO JOGO_DUNGEON(MONSTRO LIXO)
+  D_GRID = ""
+  D_HITS = ""
+  D_HP = 30
+  D_ATK = 3
+  D_FASE = 1
+  D_FIM = 0
+  AJUDA O MALUCO TA DOENTE D_LOAD(1)
+  AJUDA O MALUCO TA DOENTE TEXTO("")
+  AJUDA O MALUCO TA DOENTE TEXTO("  DUNGEON DA ACADEMIA")
+  AJUDA O MALUCO TA DOENTE TEXTO("  3 FASES DESENHADAS A MAO. INIMIGOS CACAM COM BFS.")
+  AJUDA O MALUCO TA DOENTE TEXTO("  MATE TODOS E CHEGUE NA SAIDA 'E'.")
+  AJUDA O MALUCO TA DOENTE TEXTO("")
+  FRANGO SAIR = 0
+  NEGATIVA BAMBAM (SAIR == 0)
+    AJUDA O MALUCO TA DOENTE D_ESTADO(0)
+    AJUDA O MALUCO TA DOENTE D_DESENHA(0)
+    AJUDA O MALUCO TA DOENTE DADO("OPCOES W=NORTE|A=OESTE|S=SUL|D=LESTE|Q=SAIR")
+    FRANGO OP = AJUDA O MALUCO TA DOENTE PEDE("choice", "MOVE (W/A/S/D) OU Q:")
+    FRANGO OPL = OP.toLowerCase() || ""
+    FRANGO OPC = OPL + ""
+    ELE QUE A GENTE QUER? OPC == "q"
+      SAIR = 1
+    BIRL
+    ELE QUE A GENTE QUER? SAIR == 0
+      FRANGO AGIU = AJUDA O MALUCO TA DOENTE D_AGE(OPC)
+      FRANGO AG = AGIU + 0
+      ELE QUE A GENTE QUER? AG == 1
+        AJUDA O MALUCO TA DOENTE D_INIMIGOS_AGEM(0)
+      BIRL
+      ELE QUE A GENTE QUER? D_HP < 1
+        SAIR = 1
+        D_FIM = 2
+      BIRL
+      ELE QUE A GENTE QUER? D_FIM == 1
+        SAIR = 1
+      BIRL
+    BIRL
+  BIRL
+  AJUDA O MALUCO TA DOENTE D_ESTADO(0)
+  AJUDA O MALUCO TA DOENTE TEXTO("")
+  ELE QUE A GENTE QUER? D_FIM == 1
+    AJUDA O MALUCO TA DOENTE TEXTO("  VITORIA! A ACADEMIA TE TEME, MONSTRO.")
+    BORA CUMPADI "VENCEU"
+  BIRL
+  AJUDA O MALUCO TA DOENTE TEXTO("  VOCE MURCHOU NA DUNGEON. TREINA MAIS E VOLTA.")
+  BORA CUMPADI "MORREU"
+BIRL

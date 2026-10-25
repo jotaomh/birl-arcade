@@ -2,3 +2,10 @@ node_modules/
 .npm/
 *.log
 .DS_Store
+saves/
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+.pytest_cache/
