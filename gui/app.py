@@ -203,6 +203,11 @@ class GamePage(Gtk.Box):
         self.dialogo_nome_label = None
         self.dialogo_texto_label = None
         self.dialogo_retrato = None
+        # Audio
+        self.volume = 0.7
+        self.mutado = False
+        self.audio_dir = self.raiz / "assets" / "audio"
+        self.manifest = self._carregar_manifest()
 
         self.set_margin_top(12)
         self.set_margin_bottom(12)
@@ -339,6 +344,9 @@ class GamePage(Gtk.Box):
             resto = linha[8:]
             personagem, _, texto = resto.partition("|")
             self._iniciar_dialogo(personagem, texto)
+        elif linha.startswith("SOM "):
+            som_id = linha[4:].strip()
+            self._tocar_som(som_id)
 
     def _ao_dado(self, bruto: str) -> None:
         chave, _, valor = bruto.partition(" ")
@@ -445,9 +453,57 @@ class GamePage(Gtk.Box):
             self.dialogo_texto_atual = ""
             self.dialogo_texto_label.set_label("")
 
+    def _carregar_manifest(self) -> dict[str, str]:
+        manifest: dict[str, str] = {}
+        caminho = self.audio_dir / "manifest.txt"
+        if not caminho.exists():
+            return manifest
+        try:
+            for linha in caminho.read_text(encoding="utf-8").splitlines():
+                linha = linha.strip()
+                if not linha or linha.startswith("#"):
+                    continue
+                partes = linha.split("=", 1)
+                if len(partes) == 2:
+                    manifest[partes[0].strip()] = partes[1].strip()
+        except Exception:
+            pass
+        return manifest
+
+    def _tocar_som(self, som_id: str) -> None:
+        if self.mutado:
+            return
+        arquivo = self.manifest.get(som_id, som_id + ".wav")
+        caminho = self.audio_dir / arquivo
+        if not caminho.exists():
+            return
+        try:
+            import subprocess
+            # Toca em segundo plano, nao trava o jogo
+            subprocess.Popen(
+                ["paplay", str(caminho)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
+        except Exception:
+            try:
+                import subprocess
+                subprocess.Popen(
+                    ["aplay", str(caminho)],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
+            except Exception:
+                pass
+
     def _ao_tecla(self, _ctrl, tecla, _codigo, _mods) -> bool:
         if self.encerrado:
             return False
+        if tecla == Gdk.KEY_m:
+            self.mutado = not self.mutado
+            estado = "MUTO" if self.mutado else "SOM LIGADO"
+            self._log(f"Audio: {estado}")
+            return True
         if self.dialogo_ativo:
             if tecla in (Gdk.KEY_z, Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_space):
                 self._avancar_dialogo()

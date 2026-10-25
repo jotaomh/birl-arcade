@@ -1,0 +1,12 @@
+# Manifesto de áudio do BIRL Arcade
+# Formato: id=nome_do_arquivo
+# Coloque os arquivos .ogg ou .wav em assets/audio/
+# O jogo funciona sem os arquivos (silencioso se faltar).
+
+hora_do_show=hora_do_show.ogg
+birl=birl.ogg
+ajuda_o_maluco=ajuda_o_maluco.ogg
+acerto=acerto.ogg
+erro=erro.ogg
+vitoria=vitoria.ogg
+derrota=derrota.ogg
