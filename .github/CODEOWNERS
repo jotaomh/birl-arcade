@@ -1,0 +1,29 @@
+# Reviewers obrigatórios por área do BIRL Arcade.
+# Qualquer alteração nos arquivos listados exige aprovação do CODEOWNER correspondente.
+
+# Lógica em BIRL (cérebro dos jogos)
+birl/                                @jotaomh
+docs/notas-birl.md                   @jotaomh
+
+# Interface GTK4 / Python
+gui/                                 @jotaomh
+docs/protocolo.md                    @jotaomh
+
+# Build e shell
+build                                @jotaomh
+run.sh                               @jotaomh
+
+# CI e GitHub Actions
+.github/workflows/                   @jotaomh
+.github/dependabot.yml               @jotaomh
+.github/labels.yml                   @jotaomh
+
+# Documentação geral
+docs/                                @jotaomh
+README.md                            @jotaomh
+
+# Assets (retratos, áudio)
+assets/                              @jotaomh
+
+# A própria proteção de branch fica sob revisão do dono do repo.
+.github/CODEOWNERS                   @jotaomh

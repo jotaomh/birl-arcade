@@ -1,0 +1,59 @@
+name: Ideia de Feature
+description: Sugerir uma nova funcionalidade ou melhoria no BIRL Arcade
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qual problema isso resolve?
+      description: Descreva a dor ou limitação atual.
+    validations:
+      required: true
+  - type: textarea
+    id: solucao
+    attributes:
+      label: Solução proposta
+      description: Como você imagina que isso funcionaria?
+    validations:
+      required: true
+  - type: dropdown
+    id: jogo
+    attributes:
+      label: Jogo relacionado (se houver)
+      options:
+        - jogo:velha
+        - jogo:forca
+        - jogo:academia
+        - jogo:tamagotchi
+        - jogo:dungeon
+        - interface (gui)
+        - build / run.sh
+        - outro
+        - nenhum
+    validations:
+      required: true
+  - type: dropdown
+    id: prioridade
+    attributes:
+      label: Prioridade sugerida
+      options:
+        - Alta
+        - Média
+        - Baixa
+      default: "Média"
+    validations:
+      required: false
+  - type: checkboxes
+    id: areas
+    attributes:
+      label: Áreas envolvidas
+      description: Marque as áreas que precisarão de alteração.
+      options:
+        - label: area:birl (lógica em BIRL)
+        - label: area:gui (interface GTK4/Python)
+        - label: area:build (script de build)
+        - label: area:docs (documentação)
+        - label: area:audio (som)
+        - label: area:arte (retratos/assets)
+    validations:
+      required: false
