@@ -51,7 +51,7 @@ window { background: #14161a; }
 button.acao { padding: 8px 10px; }
 .dialogo { background: #1e2229; border: 3px solid #ffcc33; border-radius: 10px; padding: 12px; }
 .dialogo-nome { font-size: 16px; font-weight: 800; color: #ffcc33; }
-.dialogo-texto { font-size: 14px; color: #d7dde5; font-family: monospace; white-space: pre-wrap; }
+.dialogo-texto { font-size: 14px; color: #d7dde5; font-family: monospace; }
 .dialogo-retrato { min-width: 64px; min-height: 64px; border: 2px solid #444; border-radius: 4px; }
 """
 
@@ -405,6 +405,13 @@ class GamePage(Gtk.Box):
             self.acoes.remove(filho)
         self.entrada.set_visible(False)
 
+    def _botao_acao(self, rotulo: str, valor: str) -> Gtk.Button:
+        botao = Gtk.Button(label=rotulo)
+        botao.add_css_class("acao")
+        botao.connect("clicked", lambda _b, v=valor: self._enviar(v))
+        self.acoes.append(botao)
+        return botao
+
     def _iniciar_dialogo(self, personagem: str, texto: str) -> None:
         if self.dialogo_timer is not None:
             GLib.source_remove(self.dialogo_timer)
@@ -515,6 +522,19 @@ class GamePage(Gtk.Box):
                 self._enviar(mapa[tecla])
                 return True
         return False
+
+    def _ao_enviar_entrada(self, _entry) -> None:
+        texto = self.entrada.get_text().strip()
+        if not texto:
+            return
+        self.entrada.set_text("")
+        self._enviar(texto)
+
+    def _enviar(self, valor: str) -> None:
+        if self.motor is None or self.encerrado:
+            return
+        self._limpar_acoes()
+        self.motor.enviar_input(valor)
 
     def _renderizar(self) -> None:
         self._limpar_acoes()
