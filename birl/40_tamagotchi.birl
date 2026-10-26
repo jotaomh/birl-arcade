@@ -32,28 +32,96 @@ OH O HOME AI PO FRANGO P_LER_SAVE(MONSTRO LIXO)
   ELE QUE A GENTE QUER? EX == 1
     FRANGO TXT = FS.readFileSync(CAMINHO, "utf8") || ""
     FRANGO TXT_OK = TXT + ""
-    ELE QUE A GENTE QUER? TXT_OK.length > 0
+    FRANGO I1 = 0 + TXT_OK.indexOf("treino")
+    FRANGO I2 = 0 + TXT_OK.indexOf("comida")
+    FRANGO I3 = 0 + TXT_OK.indexOf("vapo")
+    FRANGO I4 = 0 + TXT_OK.indexOf("hora")
+    FRANGO I5 = 0 + TXT_OK.indexOf("timestamp")
+    FRANGO I6 = 0 + TXT_OK.indexOf("}")
+    FRANGO FORMA = 1
+    ELE QUE A GENTE QUER? I1 < 0
+      FORMA = 0
+    BIRL
+    ELE QUE A GENTE QUER? I2 < 0
+      FORMA = 0
+    BIRL
+    ELE QUE A GENTE QUER? I3 < 0
+      FORMA = 0
+    BIRL
+    ELE QUE A GENTE QUER? I4 < 0
+      FORMA = 0
+    BIRL
+    ELE QUE A GENTE QUER? I5 < 0
+      FORMA = 0
+    BIRL
+    ELE QUE A GENTE QUER? I6 < 0
+      FORMA = 0
+    BIRL
+    ELE QUE A GENTE QUER? FORMA == 1
       FRANGO D = JSON.parse(TXT_OK) || 0
       FRANGO T1 = 0 + D.treino
       FRANGO T2 = 0 + D.comida
       FRANGO T3 = 0 + D.vapo
       FRANGO T4 = 0 + D.hora
       FRANGO T5 = 0 + D.timestamp
-      P_TREINO = T1 + 0
-      P_COMIDA = T2 + 0
-      P_VAPO = T3 + 0
-      P_HORA = T4 + 0
-      FRANGO AGORA = 0 + Date.now()
-      ELE QUE A GENTE QUER? MODO_GUI == 1
-        FRANGO E1 = 0 + parseInt(TEMPO_GUI, 10)
-        P_TEMPO = E1 + 0
-      NAO VAI DAR NAO
-        FRANGO DIFMS = AGORA - T5
-        FRANGO E2 = DIFMS / 1000
-        P_TEMPO = E2 + 0
+      FRANGO NUMEROS = 1
+      ELE QUE A GENTE QUER? T1 > 1000
+        NUMEROS = 0
       BIRL
-      ELE QUE A GENTE QUER? P_TEMPO < 0
-        P_TEMPO = 0
+      ELE QUE A GENTE QUER? T1 < 0
+        NUMEROS = 0
+      BIRL
+      ELE QUE A GENTE QUER? T2 > 1000
+        NUMEROS = 0
+      BIRL
+      ELE QUE A GENTE QUER? T2 < 0
+        NUMEROS = 0
+      BIRL
+      ELE QUE A GENTE QUER? T3 > 1000
+        NUMEROS = 0
+      BIRL
+      ELE QUE A GENTE QUER? T3 < 0
+        NUMEROS = 0
+      BIRL
+      ELE QUE A GENTE QUER? T4 < 0
+        NUMEROS = 0
+      BIRL
+      ELE QUE A GENTE QUER? T5 < 0
+        NUMEROS = 0
+      BIRL
+      FRANGO NAN1 = T1 + T2
+      NAN1 = NAN1 + T3
+      NAN1 = NAN1 + T4
+      NAN1 = NAN1 + T5
+      NAN1 = NAN1 + 1
+      ELE QUE A GENTE QUER? NAN1 > 0
+        NUMEROS = NUMEROS + 0
+      NAO VAI DAR NAO
+        NUMEROS = 0
+      BIRL
+      ELE QUE A GENTE QUER? NUMEROS == 1
+        P_TREINO = T1 + 0
+        P_COMIDA = T2 + 0
+        P_VAPO = T3 + 0
+        P_HORA = T4 + 0
+        FRANGO AGORA = 0 + Date.now()
+        AGORA = AGORA / 1000
+        AGORA = 0 + Math.floor(AGORA)
+        ELE QUE A GENTE QUER? T5 > 100000000000
+          T5 = T5 / 1000
+          T5 = 0 + Math.floor(T5)
+        BIRL
+        ELE QUE A GENTE QUER? MODO_GUI == 1
+          FRANGO E1 = 0 + parseInt(TEMPO_GUI, 10)
+          ELE QUE A GENTE QUER? E1 > 0
+            P_TEMPO = E1 + 0
+          BIRL
+        NAO VAI DAR NAO
+          FRANGO E2 = AGORA - T5
+          ELE QUE A GENTE QUER? E2 > 0
+            P_TEMPO = E2 + 0
+          BIRL
+        BIRL
       BIRL
     BIRL
   BIRL
@@ -112,6 +180,8 @@ OH O HOME AI PO FRANGO P_SALVA(MONSTRO LIXO)
     AJUDA O MALUCO TA DOENTE DADO("SAVE " + S)
   NAO VAI DAR NAO
     FRANGO AGORA = 0 + Date.now()
+    AGORA = AGORA / 1000
+    AGORA = 0 + Math.floor(AGORA)
     FRANGO JS = "{\"treino\":" + P_TREINO + ",\"comida\":" + P_COMIDA + ",\"vapo\":" + P_VAPO + ",\"hora\":" + P_HORA + ",\"timestamp\":" + AGORA + "}"
     FRANGO EX = 0 + FS.existsSync("saves")
     ELE QUE A GENTE QUER? EX == 0
@@ -197,6 +267,10 @@ OH O HOME AI PO FRANGO JOGO_TAMAGOTCHI(MONSTRO LIXO)
   AJUDA O MALUCO TA DOENTE TEXTO("")
   AJUDA O MALUCO TA DOENTE TEXTO("  TAMAGOTCHI DO MONSTRO")
   AJUDA O MALUCO TA DOENTE TEXTO("  O ESTADO EVOLUI PELO TEMPO REAL DESDE O ULTIMO ACESSO.")
+  ELE QUE A GENTE QUER? P_HORA > 23
+    P_HORA = 0
+    AJUDA O MALUCO TA DOENTE TEXTO("  AMANHECEU! UM NOVO DIA DE TREINO COMECOU.")
+  BIRL
   FRANGO VIVO = AJUDA O MALUCO TA DOENTE P_MORTO(0)
   ELE QUE A GENTE QUER? VIVO == 1
     P_TREINO = 60

@@ -3,6 +3,11 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+if [ ! -d node_modules ]; then
+  echo "Instalando dependencias (npm install)..."
+  npm install --no-audit --no-fund
+fi
+
 ./build
 mkdir -p saves
 
