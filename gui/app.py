@@ -52,7 +52,7 @@ button.acao { padding: 8px 10px; }
 .dialogo { background: #1e2229; border: 3px solid #ffcc33; border-radius: 10px; padding: 12px; }
 .dialogo-nome { font-size: 16px; font-weight: 800; color: #ffcc33; }
 .dialogo-texto { font-size: 14px; color: #d7dde5; font-family: monospace; }
-.dialogo-retrato { min-width: 64px; min-height: 64px; border: 2px solid #444; border-radius: 4px; }
+.dialogo-retrato { min-width: 64px; min-height: 64px; border: 2px solid #f5c542; border-radius: 4px; color: #f5c542; font-size: 40px; font-weight: bold; }
 """
 
 
@@ -203,6 +203,7 @@ class GamePage(Gtk.Box):
         self.dialogo_nome_label = None
         self.dialogo_texto_label = None
         self.dialogo_retrato = None
+        self.dialogo_imagem = None
         # Audio
         self.volume = 0.7
         self.mutado = False
@@ -267,7 +268,16 @@ class GamePage(Gtk.Box):
         self.dialogo_retrato.add_css_class("dialogo-retrato")
         self.dialogo_retrato.set_halign(Gtk.Align.START)
         self.dialogo_retrato.set_valign(Gtk.Align.START)
+        self.dialogo_retrato.set_size_request(96, 96)
         self.dialogo_widget.append(self.dialogo_retrato)
+
+        self.dialogo_imagem = Gtk.Picture()
+        self.dialogo_imagem.set_size_request(96, 96)
+        self.dialogo_imagem.set_content_fit(Gtk.ContentFit.CONTAIN)
+        self.dialogo_imagem.set_halign(Gtk.Align.START)
+        self.dialogo_imagem.set_valign(Gtk.Align.START)
+        self.dialogo_imagem.set_visible(False)
+        self.dialogo_widget.append(self.dialogo_imagem)
 
         texto_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         texto_box.set_hexpand(True)
@@ -288,8 +298,6 @@ class GamePage(Gtk.Box):
         dica.set_hexpand(True)
         texto_box.append(dica)
 
-        lado.append(self.dialogo_widget)
-
         self.botao_voltar = Gtk.Button(label="Voltar ao menu")
         self.botao_voltar.set_visible(False)
         self.botao_voltar.connect("clicked", lambda _b: self.app.voltar_menu())
@@ -297,6 +305,8 @@ class GamePage(Gtk.Box):
 
         conteudo.append(lado)
         self.append(conteudo)
+        # caixa de dialogo na parte de baixo da tela (estilo Undertale / Pokemon)
+        self.append(self.dialogo_widget)
 
         controlador = Gtk.EventControllerKey()
         controlador.connect("key-pressed", self._ao_tecla)
@@ -423,14 +433,30 @@ class GamePage(Gtk.Box):
         self.dialogo_indice = 0
         self.dialogo_widget.set_visible(True)
         self.dialogo_nome_label.set_label(personagem)
-        caminho = self.raiz / "assets" / "portraits" / f"{personagem}.png"
+        retrato_id = self.dados.get("RETRATO", "").strip() or self._normalizar_id(personagem)
+        caminho = RAIZ / "assets" / "portraits" / f"{retrato_id}.png"
         if caminho.exists():
-            self.dialogo_retrato.set_visible(False)
-            self.dialogo_retrato.set_label(personagem[0].upper())
+            try:
+                self.dialogo_imagem.set_filename(str(caminho))
+                self.dialogo_imagem.set_visible(True)
+                self.dialogo_retrato.set_visible(False)
+            except Exception:
+                self.dialogo_imagem.set_visible(False)
+                self.dialogo_retrato.set_visible(True)
+                self.dialogo_retrato.set_label(personagem[:1].upper() or "?")
         else:
+            self.dialogo_imagem.set_visible(False)
             self.dialogo_retrato.set_visible(True)
-            self.dialogo_retrato.set_label(personagem[0].upper() if personagem else "?")
+            self.dialogo_retrato.set_label(personagem[:1].upper() or "?")
         self._digitar_letra()
+
+    @staticmethod
+    def _normalizar_id(nome: str) -> str:
+        import re
+        import unicodedata
+
+        base = unicodedata.normalize("NFKD", nome).encode("ascii", "ignore").decode("ascii")
+        return re.sub(r"[^a-z0-9]+", "_", base.lower()).strip("_")
 
     def _digitar_letra(self) -> None:
         if not self.dialogo_ativo:
@@ -511,16 +537,29 @@ class GamePage(Gtk.Box):
             estado = "MUTO" if self.mutado else "SOM LIGADO"
             self._log(f"Audio: {estado}")
             return True
-        if self.dialogo_ativo:
-            if tecla in (Gdk.KEY_z, Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_space):
-                self._avancar_dialogo()
-                return True
+        if self.dialogo_ativo and tecla in (
+            Gdk.KEY_z, Gdk.KEY_Return, Gdk.KEY_KP_Enter, Gdk.KEY_space
+        ):
+            self._avancar_dialogo()
+            return True
+        if self.entrada.get_visible() and self.entrada.has_focus():
             return False
         if self.prompt_atual and self.prompt_atual[0] == "move":
-            mapa = {Gdk.KEY_w: "w", Gdk.KEY_a: "a", Gdk.KEY_s: "s", Gdk.KEY_d: "d", Gdk.KEY_q: "q"}
+            mapa = {
+                Gdk.KEY_w: "w", Gdk.KEY_a: "a", Gdk.KEY_s: "s", Gdk.KEY_d: "d", Gdk.KEY_q: "q",
+                Gdk.KEY_W: "w", Gdk.KEY_A: "a", Gdk.KEY_S: "s", Gdk.KEY_D: "d", Gdk.KEY_Q: "q",
+                Gdk.KEY_Up: "w", Gdk.KEY_Left: "a", Gdk.KEY_Down: "s", Gdk.KEY_Right: "d",
+            }
             if tecla in mapa:
                 self._enviar(mapa[tecla])
                 return True
+        if self.prompt_atual and self.prompt_atual[0] == "choice":
+            nome = Gdk.keyval_name(tecla) or ""
+            if len(nome) == 1 and nome.isdigit():
+                valores = [i.partition("=")[0] for i in self.dados.get("OPCOES", "").split("|") if i]
+                if nome in valores:
+                    self._enviar(nome)
+                    return True
         return False
 
     def _ao_enviar_entrada(self, _entry) -> None:
@@ -665,8 +704,26 @@ class GamePage(Gtk.Box):
     def _painel_dungeon(self) -> None:
         c = self._campos("HEROI")
         self._linha_stat("Dungeon da Academia", "destaque")
-        self._linha_stat(f"VIDA: {c.get('hp', '?')}  FORCA: {c.get('atk', '?')}")
+        if c.get("nome"):
+            self._linha_stat(f"{c['nome']}  NIVEL {c.get('nivel', '1')}  (XP {c.get('xp', '0')})")
+        try:
+            self._barra(f"VIDA (max {c.get('hpmax', '?')})",
+                        int(float(c.get("hp", 0))), int(float(c.get("hpmax", 1)) or 1))
+            self._barra(f"PUMP (max {c.get('pumpmax', '?')})",
+                        int(float(c.get("pump", 0))), int(float(c.get("pumpmax", 1)) or 1))
+        except ValueError:
+            pass
+        self._linha_stat(f"ATAQUE: {c.get('atk', '?')}  DEFESA: {c.get('def', '?')}  WHEY: {c.get('itens', '0')}")
         self._linha_stat(f"FASE: {c.get('fase', '?')} / 3")
+        inim = self._campos("INIM")
+        try:
+            hpmax_inim = int(float(inim.get("hpmax", 0)))
+        except ValueError:
+            hpmax_inim = 0
+        if hpmax_inim > 0:
+            self._linha_stat(f"INIMIGO: {self.dados.get('INIM', '').split(' hp=')[0].replace('nome=', '')}", "erro")
+            self._barra(f"HP DO INIMIGO (max {inim.get('hpmax', '?')})",
+                        max(0, int(float(inim.get("hp", 0)))), hpmax_inim)
         mapa = self.dados.get("MAPA", "")
         if len(mapa) >= 100:
             grade = Gtk.Grid()
