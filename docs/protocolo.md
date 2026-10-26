@@ -15,7 +15,8 @@ BIRL_MODE=gui BIRL_GAME=velha BIRL_TEMPO=0 \
 |---|---|
 | `BIRL_MODE` | `gui` ativa o protocolo; qualquer outro valor (ou ausente) usa o menu de terminal. |
 | `BIRL_GAME` | `velha`, `forca`, `academia`, `tamagotchi` ou `dungeon`. |
-| `BIRL_TEMPO` | Segundos reais decorridos desde o último save (usado só pelo Tamagotchi). |
+| `BIRL_TEMPO` | Segundos reais decorridos desde o último save (usado só pelo Tamagotchi; valor inválido vira `0`). |
+| `BIRL_SEED` | Semente dos dados da Dungeon (inteiro > 0). Sem ela, usa o relógio. |
 
 A interface abre **um processo por partida**. Quando o jogo termina, o BIRL emite `END` e
 encerra; a interface volta ao menu. Isso evita estado sujo entre jogos.
@@ -38,7 +39,7 @@ bloqueia em `fs.readSync(0, ...)` e um `console.log` assíncrono poderia ficar p
 |---|---|
 | `cell` | Grade 3×3 do jogo da velha; envia o índice `0`–`8`. |
 | `choice` | Botões montados a partir de `DATA OPCOES`. |
-| `move` | D-pad / WASD da dungeon. |
+| `move` | D-pad / WASD da dungeon; envia `w`, `a`, `s`, `d` ou `q`. No terminal real, o BIRL lê a tecla sem Enter. |
 | `text` | Campo de texto livre (palavra da forca, etc.). |
 | `next` | Botão “Continuar” (envia `ok`). |
 
@@ -66,8 +67,10 @@ A interface → BIRL não envia nada de volta para `DIALOGO`; o BIRL continua a 
 | `PET` | `PET treino=60 comida=60 vapo=60 hora=3` | Tamagotchi |
 | `SAVE` | `SAVE treino=60 comida=60 vapo=60 hora=3` | Tamagotchi (a interface grava o JSON com timestamp) |
 | `MAPA` | `MAPA ##########...` | Dungeon (100 caracteres) |
-| `HEROI` | `HEROI hp=30 atk=5 pos=11 fase=1` | Dungeon |
-| `RETRATO` | `RETRATO frango_mutante` | ID do retrato para exibir na caixa de diálogo |
+| `HEROI` | `HEROI nome=BAMBAM hp=50 hpmax=50 atk=4 def=3 pump=20 pumpmax=20 fase=1 nivel=1 xp=0 itens=3 x=1 y=1` | Dungeon |
+| `INIM` | `INIM nome=FRANGO MUTANTE hp=20 hpmax=20 def=1 dado=6` (`hpmax=0` fora de combate) | Dungeon |
+| `ROLAGEM` | `ROLAGEM D20 17` | Dungeon (a interface pode animar o dado) |
+| `RETRATO` | `RETRATO frango_mutante` | ID do retrato (`assets/portraits/<id>.png`) usado pela próxima caixa de diálogo |
 
 ### Linha `SOM`
 
@@ -82,6 +85,19 @@ O manifesto de áudio fica em `assets/audio/manifest.txt` ligando cada `id` ao n
 Valores compostos usam `chave=valor` separados por espaço; listas usam `|` e `=`:
 `DATA OPCOES 1=TREINAR PESADO|2=COMER FRANGO|0=SAIR`.
 
+### Resultados de `END`
+
+| Jogo | Valores |
+|---|---|
+| Velha | `VOCE`, `BAMBAM`, `EMPATE` |
+| Forca | `BAMBAM_GANHOU` (adivinhou a palavra), `BAMBAM_PERDEU` (errou 6 vezes) |
+| Academia / Tamagotchi | `SAIU`, `MURCHOU` (Tamagotchi) |
+| Dungeon | `VITORIA`, `DERROTA`, `SAIU` |
+| Qualquer | `EOF` (a entrada acabou) |
+
+Nada do protocolo (`SOM`, `DIALOGO`, `DATA`...) é impresso no modo terminal: lá o BIRL desenha a
+caixa de diálogo em ASCII e fica em silêncio.
+
 ## Interface → BIRL
 
 | Linha | Efeito |
@@ -92,7 +108,8 @@ Valores compostos usam `chave=valor` separados por espaço; listas usam `|` e `=
 ## Por que linha a linha casa com o BIRL atual
 
 O BIRL não tem `input()`. A função `LE_LINHA` lê **um byte por vez** com
-`fs.readSync(0, BUF, 0, 1)` até encontrar `\n`. Portanto:
+`fs.readSync(0, BUF, POS, 1)` até encontrar `\n`, descarta o `\r` (Enter em CRLF) e só
+decodifica o texto em UTF-8 no fim da linha, então acentos chegam inteiros. Portanto:
 
 - cada mensagem da interface precisa terminar em `\n`;
 - nada de JSON multilinha nem tamanho variável sem terminador;

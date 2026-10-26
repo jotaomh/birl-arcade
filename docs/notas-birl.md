@@ -45,3 +45,18 @@ Descobertas feitas testando o transpilador de verdade. Nada aqui é invenção d
 ## Recursão
 
 - Recursão de funções funciona (usada no minimax). Profundidade 9 é tranquila.
+
+## Descobertas desta rodada (aprendidas na marra)
+
+- Número negativo literal (`-1`) não compila: use `0 - 1` ou reescreva a comparação.
+- Chamada de método direto em um literal (`"-".repeat(3)`) não compila: guarde o literal em uma variável antes.
+- Atribuição cuja direita é só uma chamada com ponto (`FRANGO X = JSON.parse(T)`) precisa de `|| 0` no final.
+- `FRANGO B = A` precisa de uma operação: escreva `FRANGO B = A + 0`.
+- O mesmo vale para `ELE QUE A GENTE QUER?` logo depois de uma atribuição sem operação: o parser reclama no `ELE`.
+- Sem precedência: `A - B * C` é `(A - B) * C`. Em gerador de números aleatórios, quebre em passos
+  (o gerador da Dungeon é o MINSTD: `seed * 48271 % 2147483647`, que cabe em 53 bits sem perder precisão).
+- Ler tecla sem Enter no terminal: `stty -icanon -echo -isig` com `stdio: inherit` (via `child_process`)
+  e `fs.readSync(0, buf, 0, 1)`; depois `stty icanon echo isig`. Só quando `tty.isatty(0)` for verdadeiro.
+- `npx birl main.birl` **executa** o jogo e espera teclado. Para só conferir a transpilação, use stdin vazio
+  (`< /dev/null`) ou `birl -j`.
+

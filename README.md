@@ -21,8 +21,8 @@ continua existindo e usa exatamente a mesma lógica.
 | # | Jogo | Inteligência / regra |
 |---|------|----------------------|
 | 1 | Jogo da Velha vs Bambam | Minimax com níveis de profundidade (impossível no nível 3) |
-| 2 | Força do Bambam | O Bambam adivinha sua palavra filtrando dicionário e frequência de letras |
-| 3 | Simulador de Academia | Fadiga, recuperação, sobrecarga progressiva, dieta e lesão por regra |
+| 2 | Força do Bambam | O Bambam adivinha sua palavra filtrando dicionário e frequência de letras. Escolhe sempre a letra mais comum entre as palavras que ainda cabem e elimina palavras com letras já erradas. Palavra secreta validada (2-15 letras, A-Z). Dicionário com 250+ palavras em português (tema academia e dia a dia). |
+| 3 | Simulador de Academia | Fadiga, recuperação, sobrecarga progressiva, dieta (calorias e proteína gastam por dia) e lesão por regra |
 | 4 | Tamagotchi do Monstro | Estado evolui pelo tempo real desde o último save |
 | 5 | Dungeon da Academia RPG | Fases desenhadas à mão, inimigos perseguem com BFS, combate por turnos com d20, personagens jogáveis, progressão XP/nível |
 
@@ -85,20 +85,20 @@ npm run ver-js
 ### Terminal
 - Digite a opção e aperte **Enter**.
 - Velha: escolha uma casa de `0` a `8`.
-- Força: digite a palavra secreta; o Bambam chuta uma letra por vez.
+- Força: digite a palavra secreta (2-15 letras, A-Z, sem acentos); o Bambam chuta letras por frequência, eliminando palavras impossíveis.
 - Academia: `1` treino pesado, `2` treino leve, `3` cardio, `4` refeição,
   `5` descanso, `0` sair.
 - Tamagotchi: `1` treinar, `2` alimentar, `3` whey/vapo, `4` descansar,
   `5` ignorar (murcha mais rápido), `0` sair.
-- Dungeon: `W/A/S/D` para mover, `Q` para sair. Combate por turnos: `1` atacar, `2` habilidade, `3` item, `4` fugir. No combate do Toguro, escolha porcentagem de poder (20/50/80/100).
+- Dungeon: `W/A/S/D` move **na hora, sem Enter** (em terminal de verdade; se a entrada for um pipe/arquivo, vale a linha + Enter). `Q` sai e `Ctrl+C` também. Combate por turnos: `1` atacar, `2` habilidade, `3` item (whey), `4` fugir (teste de d20). No ataque do Toguro, escolha a porcentagem de poder (20/50/80/100).
 - `Ctrl+D` encerra.
 
 ### Gráfico
 
 - Clique nos botões de ação ou use o teclado.
 - Na velha, clique na casa.
-- Na dungeon, use `W/A/S/D` ou o D-pad para mover, `1`/`2`/`3`/`4` para ações de combate.
-- Em diálogos, aperte `Z` ou `Enter` para avançar.
+- Na dungeon, use `W/A/S/D`, as setas ou o D-pad para mover. Nas escolhas (combate, habilidades, personagem) os botões também respondem às teclas `1`-`5`.
+- Em diálogos (caixa embaixo da tela, com retrato), aperte `Z`, `Enter` ou `Espaço` para avançar; as outras teclas continuam funcionando.
 - `M` para mutar/desmutar o áudio.
 - O botão **< Menu** encerra o processo BIRL daquela partida.
 
@@ -116,14 +116,15 @@ build                 # junta birl/*.birl em main.birl (HORA DO SHOW + RODA + BI
 main.birl             # GERADO pelo build; versionado para rodar sem build
 gui/                  # somente interface: processo filho, widgets, dialogos e audio
 assets/               # retratos (portraits/) e audio (ignorados no git)
-  portraits/          # PNGs de retratos (64x64 recomendado)
-  audio/              # .ogg/.wav + manifest.txt (ignorados no git)
+  portraits/          # PNGs de retratos (96x96 recomendado) + README
+  audio/              # .ogg/.wav + manifest.txt
 docs/protocolo.md     # protocolo GUI <-> BIRL
 docs/notas-birl.md    # limitações e contornos da linguagem
 saves/                # JSON de save (ignorado no git)
 run.sh                # inicia modo terminal ou gráfico
 run-tests.sh          # testes de regressão
-.github/              # templates, labels, CI, dependabot, codeowners
+tests/                # testes que jogam de verdade (mesmo protocolo da GUI)
+tools/                # validar_assets.py: confere retratos e áudios
 ```
 
 ### Por que `main.birl` é gerado e versionado?
@@ -171,25 +172,56 @@ completo em [`docs/protocolo.md`](docs/protocolo.md).
 No arquivo `birl/50_dungeon.birl`, na função `D_INIM_CADASTRAR`, adicione um novo bloco:
 
 ```
-ELE QUE A GENTE QUER? T_I == "id_do_inimigo"
+ELE QUE A GENTE QUER? TI == "id_do_inimigo"
   D_INIM_ID = "id_do_inimigo"
   D_INIM_NOME = "NOME DO INIMIGO"
   D_INIM_HP = <vida>
   D_INIM_HP_MAX = <vida maxima>
   D_INIM_DEF = <defesa>
-  D_INIM_DADO = <dado de dano>
+  D_INIM_DADO = <dado de dano, ex.: 8 para d8>
+  D_INIM_BONUS = <bonus no d20 de ataque>
   D_INIM_XP = <xp concedido>
   D_INIM_LOOT = <loot concedido>
   D_INIM_FALA = "frase do inimigo"
 BIRL
 ```
 
+Depois, em `D_AGE`, ligue o id à fase (`INIM_ID = "id_do_inimigo"`) e rode `./build`.
 Os valores são fáceis de ajustar para balanceamento posterior.
+
+## Testes
+
+```bash
+./run-tests.sh          # ou: npm test
+```
+
+O script compila, confere que o `main.birl` inicia, compila o Python e roda os testes em
+`tests/` (Python `unittest`, sem dependências extras). Eles jogam os cinco jogos pelo protocolo
+da interface: a velha impossível nunca perde, a Forca confere o resultado e as letras, a Academia
+mantém números inteiros dentro dos limites, o Tamagotchi lida com save corrompido, tempo inválido e
+novo dia, e a Dungeon é zerada por um bot com cada personagem.
+
+## Semente dos dados (Dungeon)
+
+Os dados d20 usam um gerador com semente (em BIRL). Para repetir uma partida, defina a semente:
+
+```bash
+BIRL_SEED=12345 ./run.sh --terminal
+```
+
+Sem `BIRL_SEED`, a semente vem do relógio e cada partida é diferente. Os testes usam sementes fixas.
+
+## Combate (d20)
+
+- **Ataque:** d20 + ATK (+ bônus de precisão do Toguro) contra a defesa do inimigo (10 + DEF). `20` natural é crítico (dano dobrado) e `1` natural é falha crítica.
+- **Dano:** d8 + ATK. O inimigo ataca do mesmo jeito: d20 + bônus contra a sua defesa (10 + DEF), dano pelo dado dele.
+- **Habilidades** custam Pump e dependem do personagem; o Pump recupera +1 por turno. **Whey** (3 no começo) cura 12 HP. **Fugir** é d20 + DEF contra 12.
+- **XP e nível:** cada inimigo derrotado dá XP; subir de nível aumenta vida, Pump e ataque.
 
 ## Créditos de arte e áudio
 
-- Retratos: `assets/portraits/<id>.png` (padrão 64x64). Placeholder gerado se o arquivo não existir.
-- Áudio: `assets/audio/` (ignorados no git). Fornecidos pelo usuário. Veja `assets/audio/README.md`.
+- Retratos: `assets/portraits/<id>.png` (padrão 96x96). Se o arquivo não existir, a caixa de diálogo mostra a inicial do nome. Confira o que falta com `python3 tools/validar_assets.py`.
+- Áudio: `assets/audio/`. Fornecido pelo usuário (o som só toca no modo gráfico). Veja `assets/audio/README.md`.
 - Nenhuma arte ou áudio de terceiros (anime, jogos, pessoas reais) é usada ou baixada pelo projeto.
 
 Sai de casa codei pra caralho!™
